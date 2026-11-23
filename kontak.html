@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kontak | Bintang Perdana</title>
+  <meta name="description" content="Hubungi Bintang Perdana melalui email atau Instagram untuk bertanya tentang StokKu dan tugas Pemrograman Web 1. Temukan juga profil GitHub Bintang.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Ctext%20x='32'%20y='52'%20text-anchor='middle'%20font-family='Georgia,serif'%20font-size='58'%20font-weight='700'%20fill='%23C2491D'%3EB%3C/text%3E%3C/svg%3E">
+
+  <script>
+    // Tandai bahwa JavaScript aktif dan terapkan tema sebelum halaman tampil.
+    document.documentElement.classList.add("js");
+
+    let temaAwal = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    try {
+      const tersimpan = localStorage.getItem("tema");
+      if (tersimpan === "light" || tersimpan === "dark") temaAwal = tersimpan;
+    } catch {
+      // Gunakan tema sistem jika penyimpanan tidak tersedia.
+    }
+    document.documentElement.dataset.theme = temaAwal;
+  </script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700&amp;family=Instrument+Sans:wght@400;600&amp;display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+  <script src="js/animasi.js" defer></script>
+</head>
+<body>
+  <a href="#utama">Lewati navigasi ke konten utama</a>
+
+  <header>
+    <nav aria-label="Navigasi utama">
+      <a href="index.html">Bintang Perdana</a>
+
+      <button type="button" id="tombol-menu" aria-controls="menu" aria-expanded="false">
+        <span aria-hidden="true">&#9776;</span>
+        Menu
+      </button>
+
+      <ul id="menu">
+        <li><a href="index.html">Beranda</a></li>
+        <li><a href="proyek.html">Proyek</a></li>
+        <li><a href="kontak.html" aria-current="page">Kontak</a></li>
+      </ul>
+
+      <button type="button" id="tombol-tema" aria-pressed="false">Mode gelap</button>
+    </nav>
+  </header>
+
+  <main id="utama" tabindex="-1">
+    <header>
+      <h1>Kontak</h1>
+      <p>
+        Kalau ingin bertanya tentang StokKu atau tugas Pemrograman Web 1,
+        kamu bisa menghubungi saya melalui email atau Instagram.
+      </p>
+    </header>
+
+    <section aria-labelledby="judul-form">
+      <h2 id="judul-form" data-reveal="garis">
+        <span class="nomor-bagian">01</span> Tulis pesan
+      </h2>
+
+      <p>
+        Formulir ini bisa dicoba sebagai bagian dari tugas kuliah.
+        Untuk menghubungi saya langsung, gunakan <a href="#daftar-kontak">daftar kontak</a>.
+      </p>
+
+      <form id="form-kontak" method="post" aria-labelledby="judul-form">
+        <div>
+          <label for="nama">Nama</label>
+          <input type="text" id="nama" name="nama" autocomplete="name" aria-describedby="error-nama" required>
+          <p id="error-nama" aria-live="polite"></p>
+        </div>
+
+        <div>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" aria-describedby="error-email" required>
+          <p id="error-email" aria-live="polite"></p>
+        </div>
+
+        <div>
+          <label for="pesan">Pesan</label>
+          <textarea id="pesan" name="pesan" rows="5" aria-describedby="error-pesan" required></textarea>
+          <p id="error-pesan" aria-live="polite"></p>
+        </div>
+
+        <button type="submit" disabled>Kirim pesan</button>
+      </form>
+    </section>
+
+    <section id="daftar-kontak" aria-labelledby="judul-kontak">
+      <h2 id="judul-kontak" data-reveal="geser">
+        <span class="nomor-bagian">02</span> Daftar kontak
+      </h2>
+
+      <address>
+        <ul>
+          <li>
+            <a href="mailto:bintangperdana457@gmail.com">bintangperdana457@gmail.com</a>
+          </li>
+          <li>
+            GitHub: <a href="https://github.com/zhenn909">zhenn909</a>
+          </li>
+          <li>
+            Instagram: <a href="https://www.instagram.com/iqwnajs/">@iqwnajs</a>
+          </li>
+        </ul>
+      </address>
+    </section>
+  </main>
+
+  <footer>
+    <p>Bintang Perdana · Portofolio Pemrograman Web 1</p>
+  </footer>
+</body>
+</html>

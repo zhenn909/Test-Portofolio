@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proyek StokKu | Bintang Perdana</title>
+  <meta name="description" content="Kenali StokKu, aplikasi mobile yang dibuat Bintang Perdana dengan Flutter dan Dart untuk mencatat dan melihat stok gadget.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Ctext%20x='32'%20y='52'%20text-anchor='middle'%20font-family='Georgia,serif'%20font-size='58'%20font-weight='700'%20fill='%23C2491D'%3EB%3C/text%3E%3C/svg%3E">
+
+  <script>
+    // Tandai bahwa JavaScript aktif dan terapkan tema sebelum halaman tampil.
+    document.documentElement.classList.add("js");
+
+    let temaAwal = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    try {
+      const tersimpan = localStorage.getItem("tema");
+      if (tersimpan === "light" || tersimpan === "dark") temaAwal = tersimpan;
+    } catch {
+      // Gunakan tema sistem jika penyimpanan tidak tersedia.
+    }
+    document.documentElement.dataset.theme = temaAwal;
+  </script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700&amp;family=Instrument+Sans:wght@400;600&amp;display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+  <script src="js/animasi.js" defer></script>
+</head>
+<body>
+  <a href="#utama">Lewati navigasi ke konten utama</a>
+
+  <header>
+    <nav aria-label="Navigasi utama">
+      <a href="index.html">Bintang Perdana</a>
+
+      <button type="button" id="tombol-menu" aria-controls="menu" aria-expanded="false">
+        <span aria-hidden="true">&#9776;</span>
+        Menu
+      </button>
+
+      <ul id="menu">
+        <li><a href="index.html">Beranda</a></li>
+        <li><a href="proyek.html" aria-current="page">Proyek</a></li>
+        <li><a href="kontak.html">Kontak</a></li>
+      </ul>
+
+      <button type="button" id="tombol-tema" aria-pressed="false">Mode gelap</button>
+    </nav>
+  </header>
+
+  <main id="utama" tabindex="-1">
+    <header>
+      <h1>Proyek</h1>
+      <p>Saat belajar membuat aplikasi mobile, saya menggunakan Flutter dan Dart untuk membuat StokKu.</p>
+    </header>
+
+    <article aria-labelledby="judul-stokku">
+      <div class="ringkasan-proyek">
+        <h2 id="judul-stokku" data-reveal="garis">
+          <span class="nomor-bagian">01</span> StokKu
+        </h2>
+
+        <p data-reveal="naik" data-delay="80">
+          StokKu membantu admin tempat penyimpanan mencatat dan melihat stok gadget.
+          Barang yang dicatat bisa berupa laptop, HP, atau TV.
+        </p>
+
+        <p class="aksi-proyek">
+          <button type="button" id="tombol-detail" aria-haspopup="dialog" aria-controls="detail-stokku">
+            Lihat detail
+          </button>
+          <a href="https://github.com/zhenn909/stok-app">Lihat repositori</a>
+        </p>
+      </div>
+
+      <div class="galeri-proyek">
+        <figure tabindex="0" aria-labelledby="keterangan-daftar-stok">
+          <img src="img/stokku-1.png" alt="Tampilan daftar stok gadget di aplikasi StokKu">
+          <figcaption id="keterangan-daftar-stok">Daftar stok yang dapat dilihat oleh admin.</figcaption>
+        </figure>
+
+        <figure tabindex="0" aria-labelledby="keterangan-edit-gadget">
+          <img src="img/stokku-2.png" alt="Tampilan formulir edit gadget di aplikasi StokKu">
+          <figcaption id="keterangan-edit-gadget">Formulir untuk mengubah data gadget.</figcaption>
+        </figure>
+      </div>
+
+      <dialog id="detail-stokku" role="dialog" aria-modal="true" aria-labelledby="judul-detail">
+        <h3 id="judul-detail">Detail proyek StokKu</h3>
+
+        <!-- Form ini memakai cara tutup bawaan dialog dan menerima fokus saat modal dibuka. -->
+        <form method="dialog" class="tutup-pojok">
+          <button type="submit" aria-label="Tutup detail">×</button>
+        </form>
+
+        <p>
+          Saya membuat StokKu untuk admin yang mengelola stok gadget di tempat
+          penyimpanan. Melalui aplikasi mobile ini, admin dapat mencatat stok
+          barang, melihat kembali daftar stok, dan mengubah data gadget melalui
+          formulir edit.
+        </p>
+
+        <div class="gambar-modal">
+          <img src="img/stokku-1.png" alt="Layar StokKu yang menampilkan daftar stok gadget">
+          <img src="img/stokku-2.png" alt="Layar StokKu untuk mengedit data gadget">
+        </div>
+
+        <h4>Fitur</h4>
+        <ul>
+          <li>Mencatat stok barang.</li>
+          <li>Melihat daftar stok gadget.</li>
+          <li>Mengedit data gadget.</li>
+        </ul>
+
+        <h4>Teknologi</h4>
+        <p>Saya menggunakan Flutter dengan bahasa pemrograman Dart.</p>
+
+        <p>
+          <a href="https://github.com/zhenn909/stok-app">Buka kode sumber StokKu di GitHub</a>
+        </p>
+
+        <form method="dialog">
+          <button type="submit">Tutup detail</button>
+        </form>
+      </dialog>
+    </article>
+  </main>
+
+  <footer>
+    <p>Bintang Perdana · Portofolio Pemrograman Web 1</p>
+  </footer>
+</body>
+</html>

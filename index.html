@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Beranda | Bintang Perdana</title>
+  <meta name="description" content="Portofolio Bintang Perdana, mahasiswa Sistem Informasi Universitas Pamulang. Kenali perjalanan belajarnya dan proyek aplikasi stok gadget StokKu.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Ctext%20x='32'%20y='52'%20text-anchor='middle'%20font-family='Georgia,serif'%20font-size='58'%20font-weight='700'%20fill='%23C2491D'%3EB%3C/text%3E%3C/svg%3E">
+
+  <script>
+    // Tandai bahwa JavaScript aktif dan terapkan tema sebelum halaman tampil.
+    document.documentElement.classList.add("js");
+
+    let temaAwal = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    try {
+      const tersimpan = localStorage.getItem("tema");
+      if (tersimpan === "light" || tersimpan === "dark") temaAwal = tersimpan;
+    } catch {
+      // Gunakan tema sistem jika penyimpanan tidak tersedia.
+    }
+    document.documentElement.dataset.theme = temaAwal;
+  </script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700&amp;family=Instrument+Sans:wght@400;600&amp;display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+  <script src="js/animasi.js" defer></script>
+</head>
+<body>
+  <a href="#utama">Lewati navigasi ke konten utama</a>
+
+  <header>
+    <nav aria-label="Navigasi utama">
+      <a href="index.html">Bintang Perdana</a>
+
+      <button type="button" id="tombol-menu" aria-controls="menu" aria-expanded="false">
+        <span aria-hidden="true">&#9776;</span>
+        Menu
+      </button>
+
+      <ul id="menu">
+        <li><a href="index.html" aria-current="page">Beranda</a></li>
+        <li><a href="proyek.html">Proyek</a></li>
+        <li><a href="kontak.html">Kontak</a></li>
+      </ul>
+
+      <button type="button" id="tombol-tema" aria-pressed="false">Mode gelap</button>
+    </nav>
+  </header>
+
+  <main id="utama" tabindex="-1">
+    <header class="hero">
+      <h1>Bintang Perdana</h1>
+      <p>Saya mahasiswa Sistem Informasi di Universitas Pamulang.</p>
+      <span id="teks-ketik"></span>
+
+      <p>
+        <a href="proyek.html">Lihat proyek</a>
+        <a href="kontak.html">Hubungi saya</a>
+      </p>
+
+      <div class="foto-hero">
+        <img src="img/foto-profil.jpg" alt="Foto profil Bintang Perdana">
+      </div>
+    </header>
+
+    <section aria-labelledby="judul-tentang">
+      <h2 id="judul-tentang" data-reveal="garis">
+        <span class="nomor-bagian">01</span> Tentang
+      </h2>
+
+      <p data-reveal="naik" data-delay="80">
+        Sekarang saya kuliah di semester 5. Di mata kuliah Pemrograman Web 1,
+        saya belajar membuat halaman web dengan HTML, CSS, dan JavaScript.
+        Portofolio ini saya buat sebagai tugas mata kuliah tersebut.
+      </p>
+
+      <p>
+        Saya juga belajar membuat aplikasi mobile. Saya menggunakan Flutter
+        dan Dart untuk membuat StokKu, aplikasi yang membantu admin tempat
+        penyimpanan mencatat stok gadget.
+      </p>
+    </section>
+
+    <section aria-labelledby="judul-skill">
+      <h2 id="judul-skill"><span class="nomor-bagian">02</span> Skill</h2>
+      <p>Saya cukup mengerti tiga bahasa pemrograman dan bisa bekerja sama dalam tim.</p>
+
+      <ul data-reveal="geser">
+        <li><span>JavaScript</span></li>
+        <li><span>Java</span></li>
+        <li><span>Python</span></li>
+        <li><span>Kerja sama tim</span></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="judul-perjalanan">
+      <h2 id="judul-perjalanan">
+        <span class="nomor-bagian">03</span> Perjalanan belajar
+      </h2>
+
+      <ol>
+        <li>
+          <strong>2024</strong>
+          <span>Lulus dari SMA 3 Rangkasbitung</span>
+        </li>
+        <li>
+          <strong>2024</strong>
+          <span>Mulai kuliah Sistem Informasi di Universitas Pamulang</span>
+        </li>
+        <li>
+          <strong>Semester 5</strong>
+          <span>Belajar HTML, CSS, dan JavaScript di mata kuliah Pemrograman Web 1</span>
+        </li>
+        <li>
+          <strong>Proyek</strong>
+          <span>Membuat StokKu, aplikasi pencatat stok dengan Flutter</span>
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="judul-proyek">
+      <h2 id="judul-proyek"><span class="nomor-bagian">04</span> Proyek pilihan</h2>
+
+      <article data-reveal="naik" data-delay="120">
+        <h3>StokKu</h3>
+        <p>
+          Dengan StokKu, admin tempat penyimpanan dapat mencatat barang
+          dan melihat daftar stok gadget seperti laptop, HP, dan TV.
+        </p>
+        <a href="proyek.html">Lihat proyek StokKu</a>
+      </article>
+    </section>
+
+    <p>Ingin bertanya tentang StokKu atau tugas kuliah saya? <a href="kontak.html">Hubungi saya</a>.</p>
+  </main>
+
+  <footer>
+    <p>Bintang Perdana · Portofolio Pemrograman Web 1</p>
+  </footer>
+</body>
+</html>
