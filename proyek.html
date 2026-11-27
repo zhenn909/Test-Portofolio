@@ -1,133 +1,377 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-bs-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Proyek StokKu | Bintang Perdana</title>
-  <meta name="description" content="Kenali StokKu, aplikasi mobile yang dibuat Bintang Perdana dengan Flutter dan Dart untuk mencatat dan melihat stok gadget.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Ctext%20x='32'%20y='52'%20text-anchor='middle'%20font-family='Georgia,serif'%20font-size='58'%20font-weight='700'%20fill='%23C2491D'%3EB%3C/text%3E%3C/svg%3E">
+  <title>Proyek | Bintang Perdana</title>
+  <meta name="description" content="Lima proyek Bintang Perdana, mulai dari aplikasi mobile StokKu hingga desain app-food dan konsep wisata berkelanjutan NusaEco.">
 
   <script>
-    // Tandai bahwa JavaScript aktif dan terapkan tema sebelum halaman tampil.
+    // Terapkan pilihan tema sebelum browser menampilkan halaman.
     document.documentElement.classList.add("js");
 
-    let temaAwal = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     try {
-      const tersimpan = localStorage.getItem("tema");
-      if (tersimpan === "light" || tersimpan === "dark") temaAwal = tersimpan;
+      const tema = localStorage.getItem("tema");
+      if (tema === "light" || tema === "dark") {
+        document.documentElement.setAttribute("data-bs-theme", tema);
+      }
     } catch {
-      // Gunakan tema sistem jika penyimpanan tidak tersedia.
+      // Tema gelap dari HTML tetap dipakai jika penyimpanan diblokir.
     }
-    document.documentElement.dataset.theme = temaAwal;
   </script>
 
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Ctext%20x='32'%20y='52'%20text-anchor='middle'%20font-family='Georgia,serif'%20font-size='58'%20font-weight='700'%20fill='%23C2491D'%3EB%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700&amp;family=Instrument+Sans:wght@400;600&amp;display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="css/style.css">
-  <script src="js/main.js" defer></script>
-  <script src="js/animasi.js" defer></script>
 </head>
 <body>
-  <a href="#utama">Lewati navigasi ke konten utama</a>
+  <a class="visually-hidden-focusable position-absolute top-0 start-0 z-3 bg-body p-2"
+     href="#utama">
+    Lewati navigasi ke konten utama
+  </a>
 
-  <header>
-    <nav aria-label="Navigasi utama">
-      <a href="index.html">Bintang Perdana</a>
+  <nav class="navbar navbar-expand-md sticky-top bg-body border-bottom" aria-label="Navigasi utama">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Bintang Perdana</a>
 
-      <button type="button" id="tombol-menu" aria-controls="menu" aria-expanded="false">
-        <span aria-hidden="true">&#9776;</span>
-        Menu
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="collapse" data-bs-target="#menu-utama"
+              aria-controls="menu-utama" aria-expanded="false" aria-label="Buka atau tutup menu">
+        <span class="navbar-toggler-icon"></span>
       </button>
 
-      <ul id="menu">
-        <li><a href="index.html">Beranda</a></li>
-        <li><a href="proyek.html" aria-current="page">Proyek</a></li>
-        <li><a href="kontak.html">Kontak</a></li>
-      </ul>
-
-      <button type="button" id="tombol-tema" aria-pressed="false">Mode gelap</button>
-    </nav>
-  </header>
-
-  <main id="utama" tabindex="-1">
-    <header>
-      <h1>Proyek</h1>
-      <p>Saat belajar membuat aplikasi mobile, saya menggunakan Flutter dan Dart untuk membuat StokKu.</p>
-    </header>
-
-    <article aria-labelledby="judul-stokku">
-      <div class="ringkasan-proyek">
-        <h2 id="judul-stokku" data-reveal="garis">
-          <span class="nomor-bagian">01</span> StokKu
-        </h2>
-
-        <p data-reveal="naik" data-delay="80">
-          StokKu membantu admin tempat penyimpanan mencatat dan melihat stok gadget.
-          Barang yang dicatat bisa berupa laptop, HP, atau TV.
-        </p>
-
-        <p class="aksi-proyek">
-          <button type="button" id="tombol-detail" aria-haspopup="dialog" aria-controls="detail-stokku">
-            Lihat detail
-          </button>
-          <a href="https://github.com/zhenn909/stok-app">Lihat repositori</a>
-        </p>
-      </div>
-
-      <div class="galeri-proyek">
-        <figure tabindex="0" aria-labelledby="keterangan-daftar-stok">
-          <img src="img/stokku-1.png" alt="Tampilan daftar stok gadget di aplikasi StokKu">
-          <figcaption id="keterangan-daftar-stok">Daftar stok yang dapat dilihat oleh admin.</figcaption>
-        </figure>
-
-        <figure tabindex="0" aria-labelledby="keterangan-edit-gadget">
-          <img src="img/stokku-2.png" alt="Tampilan formulir edit gadget di aplikasi StokKu">
-          <figcaption id="keterangan-edit-gadget">Formulir untuk mengubah data gadget.</figcaption>
-        </figure>
-      </div>
-
-      <dialog id="detail-stokku" role="dialog" aria-modal="true" aria-labelledby="judul-detail">
-        <h3 id="judul-detail">Detail proyek StokKu</h3>
-
-        <!-- Form ini memakai cara tutup bawaan dialog dan menerima fokus saat modal dibuka. -->
-        <form method="dialog" class="tutup-pojok">
-          <button type="submit" aria-label="Tutup detail">×</button>
-        </form>
-
-        <p>
-          Saya membuat StokKu untuk admin yang mengelola stok gadget di tempat
-          penyimpanan. Melalui aplikasi mobile ini, admin dapat mencatat stok
-          barang, melihat kembali daftar stok, dan mengubah data gadget melalui
-          formulir edit.
-        </p>
-
-        <div class="gambar-modal">
-          <img src="img/stokku-1.png" alt="Layar StokKu yang menampilkan daftar stok gadget">
-          <img src="img/stokku-2.png" alt="Layar StokKu untuk mengedit data gadget">
-        </div>
-
-        <h4>Fitur</h4>
-        <ul>
-          <li>Mencatat stok barang.</li>
-          <li>Melihat daftar stok gadget.</li>
-          <li>Mengedit data gadget.</li>
+      <div class="collapse navbar-collapse" id="menu-utama">
+        <ul class="navbar-nav ms-md-auto me-md-3">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Beranda</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="proyek.html" aria-current="page">Proyek</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="kontak.html">Kontak</a>
+          </li>
         </ul>
 
-        <h4>Teknologi</h4>
-        <p>Saya menggunakan Flutter dengan bahasa pemrograman Dart.</p>
+        <button class="btn btn-outline-secondary my-2 my-md-0" type="button"
+                id="tombol-tema" aria-label="Mode gelap" aria-pressed="true">
+          Mode terang
+        </button>
+      </div>
+    </div>
+  </nav>
 
-        <p>
-          <a href="https://github.com/zhenn909/stok-app">Buka kode sumber StokKu di GitHub</a>
-        </p>
+  <main class="container py-5" id="utama" tabindex="-1">
+    <header class="mb-4">
+      <h1>Proyek</h1>
+      <p class="lead mb-0">
+        Di sini saya mengumpulkan tiga aplikasi mobile, satu desain aplikasi,
+        dan satu proyek konsep. Pilih kategori untuk melihat proyek yang sesuai.
+      </p>
+    </header>
 
-        <form method="dialog">
-          <button type="submit">Tutup detail</button>
-        </form>
-      </dialog>
-    </article>
+    <div class="btn-group mb-4" role="group" aria-label="Filter kategori proyek">
+      <button type="button" class="btn btn-outline-primary active"
+              data-filter="Semua" aria-controls="daftar-proyek" aria-pressed="true">
+        Semua
+      </button>
+      <button type="button" class="btn btn-outline-primary"
+              data-filter="Mobile" aria-controls="daftar-proyek" aria-pressed="false">
+        Mobile
+      </button>
+      <button type="button" class="btn btn-outline-primary"
+              data-filter="Desain" aria-controls="daftar-proyek" aria-pressed="false">
+        Desain
+      </button>
+      <button type="button" class="btn btn-outline-primary"
+              data-filter="Konsep" aria-controls="daftar-proyek" aria-pressed="false">
+        Konsep
+      </button>
+    </div>
+
+    <div id="daftar-proyek">
+      <!-- Urutan teks alternatif mengikuti urutan gambar pada setiap proyek. -->
+      <article class="border-top py-5" aria-labelledby="judul-stokku"
+               data-kategori="Mobile"
+               data-judul="StokKu"
+               data-deskripsi="StokKu adalah aplikasi mobile untuk admin tempat penyimpanan gadget seperti laptop, HP, dan TV. Admin dapat mencatat stok, melihat daftar stok, dan mengedit data gadget."
+               data-teknologi="Flutter, Dart"
+               data-status="Selesai"
+               data-catatan=""
+               data-repo="https://github.com/zhenn909/stok-app"
+               data-gambar="img/stokku-1.png,img/stokku-2.png"
+               data-alt="Tampilan daftar stok pada aplikasi StokKu|Formulir edit data gadget pada aplikasi StokKu">
+        <div class="row align-items-start g-4">
+          <div class="col-12 col-md-5">
+            <h2 id="judul-stokku" data-reveal="garis">
+              <span class="nomor-bagian">01</span> StokKu
+            </h2>
+            <p>
+              StokKu membantu admin tempat penyimpanan mencatat dan melihat stok
+              laptop, HP, dan TV. Admin juga dapat mengedit data gadget.
+            </p>
+            <dl class="mb-3">
+              <dt>Kategori</dt>
+              <dd>Mobile</dd>
+              <dt>Teknologi</dt>
+              <dd>Flutter, Dart</dd>
+              <dt>Status</dt>
+              <dd><span class="badge text-bg-secondary">Selesai</span></dd>
+            </dl>
+
+            <div class="d-flex flex-wrap align-items-center gap-3">
+              <button type="button" class="btn btn-outline-primary"
+                      data-bs-toggle="modal" data-bs-target="#modal-proyek"
+                      aria-label="Lihat detail StokKu">
+                Lihat detail
+              </button>
+              <a href="https://github.com/zhenn909/stok-app">Lihat repositori</a>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-7">
+            <div class="row row-cols-2 g-3">
+              <figure class="col mb-0">
+                <img class="img-fluid border" src="img/stokku-1.png"
+                     alt="Tampilan daftar stok pada aplikasi StokKu" loading="lazy">
+                <figcaption class="small text-body-secondary mt-2">Daftar stok gadget</figcaption>
+              </figure>
+              <figure class="col mb-0">
+                <img class="img-fluid border" src="img/stokku-2.png"
+                     alt="Formulir edit data gadget pada aplikasi StokKu" loading="lazy">
+                <figcaption class="small text-body-secondary mt-2">Formulir edit gadget</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="border-top py-4" aria-labelledby="judul-steam"
+               data-kategori="Mobile"
+               data-judul="Steam App"
+               data-deskripsi="Steam App adalah aplikasi mobile untuk mencatat kendaraan, baik motor maupun mobil, yang dicuci di tempat cuci steam."
+               data-teknologi="Flutter, Dart"
+               data-status="Selesai"
+               data-catatan="Kode belum dipublikasikan."
+               data-repo=""
+               data-gambar="img/steam-1.png,img/steam-2.png"
+               data-alt="Tangkapan layar pertama Steam App untuk pencatatan kendaraan di tempat cuci steam|Tangkapan layar kedua Steam App untuk pencatatan kendaraan di tempat cuci steam">
+        <div class="row align-items-start g-3">
+          <div class="col-12 col-md-5">
+            <h2 class="h3 mb-0" id="judul-steam">
+              <span class="nomor-bagian">02</span> Steam App
+            </h2>
+          </div>
+          <div class="col-12 col-md-4">
+            <dl class="mb-0">
+              <dt>Kategori</dt>
+              <dd>Mobile</dd>
+              <dt>Teknologi</dt>
+              <dd>Flutter, Dart</dd>
+              <dt>Status</dt>
+              <dd class="mb-0">
+                <span class="badge text-bg-secondary">Selesai</span>
+                <span class="d-block small mt-1">Kode belum dipublikasikan.</span>
+              </dd>
+            </dl>
+          </div>
+          <div class="col-12 col-md-3 text-md-end">
+            <button type="button" class="btn btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#modal-proyek"
+                    aria-label="Lihat detail Steam App">
+              Lihat detail
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="border-top py-4" aria-labelledby="judul-keuangan"
+               data-kategori="Mobile"
+               data-judul="Aplikasi Keuangan Harian Mahasiswa"
+               data-deskripsi="Aplikasi mobile ini digunakan untuk mencatat keuangan harian mahasiswa."
+               data-teknologi="Flutter, Dart, SQLite"
+               data-status="Selesai"
+               data-catatan="Kode belum dipublikasikan."
+               data-repo=""
+               data-gambar="img/keuangan-1.png,img/keuangan-2.png,img/keuangan-3.png,img/keuangan-4.png"
+               data-alt="Tangkapan layar pertama Aplikasi Keuangan Harian Mahasiswa|Tangkapan layar kedua Aplikasi Keuangan Harian Mahasiswa|Tangkapan layar ketiga Aplikasi Keuangan Harian Mahasiswa|Tangkapan layar keempat Aplikasi Keuangan Harian Mahasiswa">
+        <div class="row align-items-start g-3">
+          <div class="col-12 col-md-5">
+            <h2 class="h3 mb-0" id="judul-keuangan">
+              <span class="nomor-bagian">03</span> Aplikasi Keuangan Harian Mahasiswa
+            </h2>
+          </div>
+          <div class="col-12 col-md-4">
+            <dl class="mb-0">
+              <dt>Kategori</dt>
+              <dd>Mobile</dd>
+              <dt>Teknologi</dt>
+              <dd>Flutter, Dart, SQLite</dd>
+              <dt>Status</dt>
+              <dd class="mb-0">
+                <span class="badge text-bg-secondary">Selesai</span>
+                <span class="d-block small mt-1">Kode belum dipublikasikan.</span>
+              </dd>
+            </dl>
+          </div>
+          <div class="col-12 col-md-3 text-md-end">
+            <button type="button" class="btn btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#modal-proyek"
+                    aria-label="Lihat detail Aplikasi Keuangan Harian Mahasiswa">
+              Lihat detail
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="border-top py-4" aria-labelledby="judul-app-food"
+               data-kategori="Desain"
+               data-judul="app-food (nama sementara)"
+               data-deskripsi="app-food adalah desain antarmuka aplikasi pemesanan makanan online sejenis Gojek/ShopeeFood."
+               data-teknologi="Figma"
+               data-status="Desain konsep"
+               data-catatan="Belum berupa aplikasi jadi."
+               data-repo=""
+               data-prototipe="https://www.figma.com/proto/OUoVVxzmqyXxA7EEOpglTK/food-app?node-id=1-141&amp;starting-point-node-id=1%3A141&amp;t=qvVgUTA2JvMNFQ6m-1"
+               data-gambar="img/app-food-1.png,img/app-food-2.png"
+               data-alt="Tampilan pertama desain antarmuka pemesanan makanan app-food|Tampilan kedua desain antarmuka pemesanan makanan app-food">
+        <div class="row align-items-start g-3">
+          <div class="col-12 col-md-5">
+            <h2 class="h3 mb-0" id="judul-app-food">
+              <span class="nomor-bagian">04</span> app-food (nama sementara)
+            </h2>
+          </div>
+          <div class="col-12 col-md-4">
+            <dl class="mb-0">
+              <dt>Kategori</dt>
+              <dd>Desain</dd>
+              <dt>Alat</dt>
+              <dd>Figma</dd>
+              <dt>Status</dt>
+              <dd class="mb-0">
+                <span class="badge text-bg-secondary">Desain konsep</span>
+                <span class="d-block small mt-1">Belum berupa aplikasi jadi.</span>
+              </dd>
+            </dl>
+          </div>
+          <div class="col-12 col-md-3 text-md-end">
+            <button type="button" class="btn btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#modal-proyek"
+                    aria-label="Lihat detail desain app-food">
+              Lihat detail
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="border-top border-bottom py-4" aria-labelledby="judul-nusaeco"
+               data-kategori="Konsep"
+               data-judul="NusaEco"
+               data-deskripsi="NusaEco adalah konsep aplikasi web dan mobile fiktif untuk perencanaan perjalanan wisata berkelanjutan (sustainable &amp; responsible travel) di Indonesia."
+               data-teknologi=""
+               data-status="Konsep fiktif"
+               data-catatan="Ilustrasi dibuat dengan bantuan AI."
+               data-repo=""
+               data-gambar="img/nusaeco-1.png,img/nusaeco-2.png"
+               data-alt="Ilustrasi pertama konsep perjalanan wisata berkelanjutan NusaEco di Indonesia|Ilustrasi kedua konsep perjalanan wisata berkelanjutan NusaEco di Indonesia">
+        <div class="row align-items-start g-3">
+          <div class="col-12 col-md-5">
+            <h2 class="h3 mb-0" id="judul-nusaeco">
+              <span class="nomor-bagian">05</span> NusaEco
+            </h2>
+          </div>
+          <div class="col-12 col-md-4">
+            <dl class="mb-0">
+              <dt>Kategori</dt>
+              <dd>Konsep</dd>
+              <dt>Status</dt>
+              <dd class="mb-0">
+                <span class="badge text-bg-secondary">Konsep fiktif</span>
+                <span class="d-block small mt-1">Ilustrasi dibuat dengan bantuan AI.</span>
+              </dd>
+            </dl>
+          </div>
+          <div class="col-12 col-md-3 text-md-end">
+            <button type="button" class="btn btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#modal-proyek"
+                    aria-label="Lihat detail NusaEco">
+              Lihat detail
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
   </main>
 
-  <footer>
-    <p>Bintang Perdana · Portofolio Pemrograman Web 1</p>
+  <footer class="border-top py-4">
+    <div class="container">
+      <p class="mb-0">Bintang Perdana · Portofolio Pemrograman Web 1</p>
+    </div>
   </footer>
+
+  <!-- Satu modal dan satu carousel dipakai bergantian oleh kelima proyek. -->
+  <div class="modal fade" id="modal-proyek" tabindex="-1"
+       aria-labelledby="modal-judul" aria-describedby="modal-deskripsi" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-4" id="modal-judul">Detail proyek</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Tutup detail"></button>
+        </div>
+
+        <div class="modal-body">
+          <p id="modal-deskripsi"></p>
+
+          <div class="carousel slide mb-3" id="carousel-proyek"
+               role="region" aria-label="Galeri gambar proyek" data-bs-interval="false">
+            <div class="carousel-indicators d-none" id="indikator-gambar"></div>
+
+            <!-- main.js mengisi bagian ini saat modal dibuka. -->
+            <div class="carousel-inner" id="modal-gambar"></div>
+
+            <button class="carousel-control-prev d-none" type="button"
+                    data-bs-target="#carousel-proyek" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon bg-dark rounded" aria-hidden="true"></span>
+              <span class="visually-hidden">Gambar sebelumnya</span>
+            </button>
+
+            <button class="carousel-control-next d-none" type="button"
+                    data-bs-target="#carousel-proyek" data-bs-slide="next">
+              <span class="carousel-control-next-icon bg-dark rounded" aria-hidden="true"></span>
+              <span class="visually-hidden">Gambar berikutnya</span>
+            </button>
+          </div>
+
+          <p class="small text-body-secondary d-none" id="galeri-kosong" role="status">
+            Gambar proyek belum tersedia.
+          </p>
+
+          <dl class="mb-0">
+            <dt>Kategori</dt>
+            <dd id="modal-kategori"></dd>
+            <dt id="label-teknologi">Teknologi</dt>
+            <dd id="modal-teknologi"></dd>
+            <dt>Status</dt>
+            <dd class="mb-0">
+              <span class="badge text-bg-secondary" id="modal-status"></span>
+              <span class="d-block small mt-1" id="modal-catatan"></span>
+            </dd>
+          </dl>
+        </div>
+
+        <div class="modal-footer">
+          <a class="btn btn-outline-primary d-none" id="modal-repo">Lihat repositori</a>
+          <a class="btn btn-outline-primary d-none" id="modal-prototipe">Lihat prototipe Figma</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="js/main.js"></script>
+  <script src="js/animasi.js"></script>
 </body>
 </html>
