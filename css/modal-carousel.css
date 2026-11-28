@@ -1,5 +1,4 @@
-/* Mengatur badge, modal, dan carousel di Proyek serta alert dan toast di Kontak.
-   Dimuat di semua halaman setelah form.css. */
+/* Mengatur badge, modal, dan carousel di Proyek serta alert dan toast di Kontak.*/
 
 .badge.text-bg-secondary {
   color: var(--teks-badge) !important;

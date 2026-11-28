@@ -1,5 +1,4 @@
-/* Mengatur kursor, garis progres scroll, tombol kembali ke atas, dan panel transisi halaman.
-   Dipakai di semua halaman. Dimuat setelah modal-carousel.css. */
+/* Mengatur kursor, garis progres scroll, tombol kembali ke atas, dan panel transisi halaman.*/
 
 #progress-scroll {
   position: fixed;

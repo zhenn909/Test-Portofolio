@@ -1,5 +1,4 @@
-/* Warna, ukuran, font, dan variabel Bootstrap.
-   Dipakai di semua halaman. Dimuat setelah Bootstrap. */
+/* Warna, ukuran, font, dan variabel Bootstrap.*/
 
 :root {
   --font-judul: "Fraunces", Georgia, serif;

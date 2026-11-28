@@ -1,5 +1,4 @@
-/* Warna teks footer.
-   Dipakai di semua halaman. Dimuat setelah kursor-progres.css. */
+/* Warna teks footer.*/
 
 body > footer {
   color: var(--bs-secondary-color);

@@ -1,70 +1,140 @@
-/* Mengatur daftar kontak, tombol salin email, dan panel formulir.
-   Dipakai di halaman Kontak. Dimuat setelah animasi.css. */
-
-.tautan-kontak {
-  position: relative;
-  display: inline-block;
-  max-width: 100%;
-  min-width: 0;
-  padding-block: 0.2rem;
-  color: var(--warna-teks);
-  font: 400 clamp(1.55rem, 3vw, 2.45rem) / 1.2 var(--font-judul);
-  letter-spacing: -0.035em;
-  text-decoration: none;
-}
-
-#alamat-email {
-  font-size: clamp(1.1rem, 2.3vw, 1.9rem);
-  overflow-wrap: anywhere;
-}
-
-.nilai-kontak {
-  display: inline-block;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-.panah-kontak {
-  display: inline-block;
-  color: var(--warna-tautan);
-  font-size: 0.65em;
-}
-
-.tautan-kontak::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 1px;
-  background-color: var(--aksen);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-
-.tautan-kontak:focus-visible::after {
-  transform: scaleX(1);
+.halaman-kontak .kepala-halaman {
+  margin-bottom: clamp(2rem, 5vw, 4rem);
 }
 
 .baris-kontak {
-  padding-block: 1.25rem;
+  padding-block: clamp(1.25rem, 2.5vw, 2rem);
+  border-top: 1px solid var(--bs-border-color);
+}
+
+.baris-kontak:last-child {
   border-bottom: 1px solid var(--bs-border-color);
 }
 
-.baris-kontak:first-child {
-  padding-top: 0;
+.baris-kontak .label-kontak {
+  display: block;
+  margin-bottom: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+/* Selector ini juga berlaku saat animasi scroll memberi data-reveal pada tautan. */
+html .halaman-kontak .daftar-kontak a.tautan-kontak {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 0.85rem;
+  color: var(--bs-body-color);
+  text-decoration: none;
+}
+
+.nilai-kontak {
+  font: 400 clamp(1.7rem, 3.8vw, 3.1rem) / 1.15 var(--font-judul);
+  letter-spacing: -0.035em;
+}
+
+.baris-nilai {
+  display: block;
+  white-space: nowrap;
+}
+
+.domain-email {
+  opacity: 0.65;
+}
+
+.panah-kontak {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 50%;
+}
+
+.panah-kontak svg {
+  rotate: -45deg;
 }
 
 #salin-email {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 44px;
+  margin-top: 1rem;
+}
+
+/* Gunakan aksen teks yang lebih gelap di tema terang agar tetap terbaca. */
+.tautan-kontak:focus-visible .nilai-kontak {
+  color: var(--warna-tautan);
+}
+
+.tautan-kontak:focus-visible .domain-email {
+  opacity: 1;
+}
+
+.tautan-kontak:focus-visible .panah-kontak {
+  background-color: var(--aksen);
+  border-color: var(--aksen);
+  color: var(--teks-di-aksen);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tautan-kontak:hover .nilai-kontak {
+    color: var(--warna-tautan);
+  }
+
+  .tautan-kontak:hover .domain-email {
+    opacity: 1;
+  }
+
+  .tautan-kontak:hover .panah-kontak {
+    background-color: var(--aksen);
+    border-color: var(--aksen);
+    color: var(--teks-di-aksen);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tautan-kontak .nilai-kontak {
+    transition: translate 350ms ease, color 350ms ease;
+  }
+
+  .panah-kontak svg {
+    transition: rotate 350ms ease;
+  }
+
+  .panah-kontak {
+    transition: background-color 350ms ease, color 350ms ease;
+  }
+
+  .tautan-kontak:focus-visible .nilai-kontak {
+    translate: 10px 0;
+  }
+
+  .tautan-kontak:focus-visible svg {
+    rotate: 0deg;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .tautan-kontak:hover .nilai-kontak {
+    translate: 10px 0;
+  }
+
+  .tautan-kontak:hover svg {
+    rotate: 0deg;
+  }
 }
 
 #form-kontak.panel-form {
   padding: clamp(1.5rem, 3vw, 2.75rem);
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid rgba(var(--teks-rgb), 0.14);
   border-radius: 20px;
-  background-color: var(--latar-form);
+  background-color: rgb(255 255 255 / 4%);
   box-shadow: none;
+}
+
+html[data-bs-theme="light"] #form-kontak.panel-form {
+  background-color: rgb(255 255 255 / 45%);
 }
 
 #judul-form {
@@ -72,22 +142,6 @@
   font: 400 clamp(1.45rem, 2.5vw, 2rem) / 1.2 var(--font-judul);
 }
 
-@media (hover: hover) {
-  .tautan-kontak:hover {
-    color: var(--warna-tautan);
-  }
-
-  .tautan-kontak:hover::after {
-    transform: scaleX(1);
-  }
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .tautan-kontak:hover .nilai-kontak {
-    transform: translateX(0.15rem);
-  }
-
-  .tautan-kontak:hover .panah-kontak {
-    transform: translateX(0.35rem);
-  }
+#form-kontak .kolom-form {
+  margin-bottom: 1.25rem;
 }

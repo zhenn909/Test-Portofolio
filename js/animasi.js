@@ -1,4 +1,3 @@
-// Mengatur animasi hero, scroll, filter, kursor, tombol, pratinjau, dan perpindahan halaman.
 "use strict";
 
 (() => {
@@ -7,7 +6,7 @@
   const pointerHalus = window.matchMedia("(hover: hover) and (pointer: fine)");
   const kunciTransisi = "portofolio-tujuan-transisi";
 
-  // Bagi nama menjadi dua baris agar setiap kata bisa muncul secara berurutan.
+  // Membagi nama menjadi dua baris. CSS mengatur urutan garis, nama, teks, tombol, dan foto.
   function siapkanHero() {
     const hero = document.querySelector("header.hero");
     const judul = hero?.querySelector("h1");
@@ -35,15 +34,15 @@
     hero.classList.add("hero-siap");
   }
 
-  // Ketik dan hapus kalimat di hero. Jeda saat tab disembunyikan.
+  // Mengetik dan menghapus kalimat. Saat tab disembunyikan, posisi huruf disimpan.
   function siapkanEfekKetik() {
     const tempat = document.getElementById("teks-ketik");
     if (!tempat) return;
 
     const kalimat = [
-      "mahasiswa Sistem Informasi.",
-      "yang sedang belajar membuat web.",
-      "yang pernah membuat aplikasi mobile dengan Flutter."
+      "mahasiswa Sistem Informasi Semester 5.",
+      "yang sedang belajar membuat website.",
+      "yang pernah membuat beberapa aplikasi mobile dengan Flutter."
     ];
 
     const visual = document.createElement("span");
@@ -61,7 +60,6 @@
     let sisaJeda = 560;
     let batasWaktu = 0;
 
-    // Simpan waktu langkah berikutnya agar pengetikan bisa dilanjutkan.
     function jadwalkan(jeda) {
       sisaJeda = jeda;
       if (document.hidden || gerakanMinimal.matches) return;
@@ -70,7 +68,6 @@
       timer = window.setTimeout(langkah, jeda);
     }
 
-    // Tambah atau hapus satu huruf, lalu tentukan jeda berikutnya.
     function langkah() {
       timer = 0;
       const teks = kalimat[indeks];
@@ -89,7 +86,6 @@
       }
     }
 
-    // Tampilkan kalimat lengkap saat pengguna mengurangi gerakan.
     function aturGerakan() {
       window.clearTimeout(timer);
       timer = 0;
@@ -118,7 +114,7 @@
     aturGerakan();
   }
 
-  // Tentukan jenis animasi dan jeda untuk isi halaman serta footer.
+  // Memberi jenis gerakan dan jeda pada isi halaman, termasuk elemen yang sudah diberi data-reveal.
   function kumpulkanReveal() {
     const hasil = [];
     const urutanInduk = new Map();
@@ -138,7 +134,6 @@
 
     for (const area of document.querySelectorAll("main, body > footer")) {
       for (const item of area.querySelectorAll(sasaran)) {
-        // Animasikan baris proyek sebagai satu kesatuan agar tombol tetap mencakup baris.
         if (item.closest(".baris-proyek") && !item.matches(".baris-proyek")) continue;
         if (item.closest(pengecualian)) continue;
         if (item.matches("figure img") && !item.hasAttribute("data-reveal")) continue;
@@ -163,9 +158,7 @@
         const urutan = urutanInduk.get(induk) || 0;
         urutanInduk.set(induk, urutan + 1);
 
-        const jeda = item.hasAttribute("data-delay")
-          ? Number(item.dataset.delay)
-          : urutan * 70;
+        const jeda = item.hasAttribute("data-delay") ? Number(item.dataset.delay) : urutan * 70;
         const jedaAman = Number.isFinite(jeda) ? Math.max(0, Math.min(400, jeda)) : 0;
         item.style.setProperty("--delay", `${jedaAman}ms`);
 
@@ -187,7 +180,7 @@
     return hasil;
   }
 
-  // Mulai animasi ketika elemen masuk layar. Siapkan ulang setelah keluar sepenuhnya.
+  // Pengamat pertama memulai animasi. Pengamat kedua baru mereset setelah elemen keluar dari layar.
   function siapkanReveal() {
     if (!("IntersectionObserver" in window)) return;
 
@@ -198,7 +191,6 @@
     let arah = "bawah";
     let frame = 0;
 
-    // Bandingkan posisi scroll sekarang dengan posisi sebelumnya.
     function bacaArah() {
       const posisi = Math.max(0, window.scrollY);
       if (posisi !== posisiLama) arah = posisi < posisiLama ? "atas" : "bawah";
@@ -208,20 +200,18 @@
       akar.classList.toggle("arah-bawah", arah === "bawah");
     }
 
-    // Baca arah scroll paling banyak sekali per frame.
     function jadwalkanArah() {
       if (frame) return;
-
       frame = window.requestAnimationFrame(() => {
         frame = 0;
         bacaArah();
       });
     }
 
-    // Simpan arah saat elemen mulai muncul.
     function tampilkan(item) {
       if (item.classList.contains("is-visible")) return;
 
+      // Simpan arah pada elemen agar animasi yang sedang berjalan tidak berbalik mendadak.
       item.style.setProperty("--arah-masuk", arah === "atas" ? "-1" : "1");
       item.classList.add("is-visible");
     }
@@ -248,7 +238,6 @@
       }
     }, { threshold: 0 });
 
-    // Pasang atau lepas pengamat ketika preferensi gerakan berubah.
     function aturReveal() {
       pengamatMasuk.disconnect();
       pengamatKeluar.disconnect();
@@ -277,7 +266,6 @@
 
     document.addEventListener("focusin", (event) => {
       if (!akar.classList.contains("reveal-aktif")) return;
-      if (!(event.target instanceof Element)) return;
 
       let item = event.target.closest("[data-reveal]");
       while (item) {
@@ -290,7 +278,7 @@
     aturReveal();
   }
 
-  // Gambar garis timeline sesuai posisi scroll.
+  // Menggambar garis timeline dari titik pertama sampai terakhir sesuai posisi scroll.
   function siapkanTimeline() {
     const daftar = document.querySelector("#perjalanan .timeline");
     if (!daftar || !("IntersectionObserver" in window)) return;
@@ -298,12 +286,12 @@
     const item = Array.from(daftar.children);
     if (!item.length) return;
 
+    let aktif = false;
     let frame = 0;
     let pusat = 0;
     let panjang = 0;
     let posisi = [];
 
-    // Perbarui panjang garis dan titik yang sudah tercapai.
     function gambar() {
       frame = 0;
       if (gerakanMinimal.matches || !posisi.length) return;
@@ -313,18 +301,15 @@
       const bagian = panjang > 0 ? batas / panjang : Number(batas >= 0);
 
       daftar.style.setProperty("--progres", Math.max(0, Math.min(1, bagian)));
-
       item.forEach((baris, indeks) => {
         baris.classList.toggle("is-aktif", batas >= posisi[indeks]);
       });
     }
 
-    // Gabungkan permintaan gambar yang datang dalam frame yang sama.
     function jadwalkan() {
       if (!frame) frame = window.requestAnimationFrame(gambar);
     }
 
-    // Ukur lagi titik timeline saat ukuran halaman atau font berubah.
     function ukur() {
       if (gerakanMinimal.matches) return;
 
@@ -341,9 +326,10 @@
     }
 
     const pengamat = new IntersectionObserver(([data]) => {
-      if (gerakanMinimal.matches || !data) return;
+      if (gerakanMinimal.matches) return;
 
-      if (data.isIntersecting) {
+      aktif = data.isIntersecting;
+      if (aktif) {
         window.addEventListener("scroll", jadwalkan, { passive: true });
       } else {
         window.removeEventListener("scroll", jadwalkan);
@@ -352,8 +338,8 @@
       jadwalkan();
     }, { rootMargin: "100px 0px" });
 
-    // Aktifkan timeline bergerak jika pengguna mengizinkan animasi.
     function aturTimeline() {
+      aktif = false;
       pengamat.disconnect();
       window.removeEventListener("scroll", jadwalkan);
       window.cancelAnimationFrame(frame);
@@ -378,7 +364,7 @@
     aturTimeline();
   }
 
-  // Animasikan proyek yang kembali terlihat setelah pengguna mengganti filter.
+  // Membandingkan daftar sebelum dan sesudah main.js menjalankan filter Bootstrap.
   function siapkanAnimasiFilter() {
     const daftar = document.getElementById("daftar-proyek");
     const filter = document.querySelector(".filter-proyek");
@@ -388,15 +374,13 @@
     let tersembunyi = new Set();
     let frame = 0;
 
-    // Lepas penanda agar animasi bisa dipakai lagi pada filter berikutnya.
     function bersihkan(item) {
       item.classList.remove("filter-masuk");
       item.style.removeProperty("--jeda-filter");
     }
 
-    // Catat proyek tersembunyi sebelum main.js menjalankan filter.
+    // Fase capture berjalan sebelum handler klik tombol di main.js.
     filter.addEventListener("click", (event) => {
-      if (!(event.target instanceof Element)) return;
       if (!event.target.closest("button[data-filter]")) return;
 
       window.cancelAnimationFrame(frame);
@@ -405,13 +389,10 @@
     }, true);
 
     filter.addEventListener("click", (event) => {
-      if (gerakanMinimal.matches || !(event.target instanceof Element)) return;
-      if (!event.target.closest("button[data-filter]")) return;
+      if (gerakanMinimal.matches || !event.target.closest("button[data-filter]")) return;
 
       frame = window.requestAnimationFrame(() => {
-        const muncul = proyek.filter((item) => {
-          return tersembunyi.has(item) && !item.classList.contains("d-none");
-        });
+        const muncul = proyek.filter((item) => tersembunyi.has(item) && !item.classList.contains("d-none"));
 
         muncul.forEach((item, indeks) => {
           item.style.setProperty("--jeda-filter", `${indeks * 60}ms`);
@@ -420,7 +401,6 @@
       });
     });
 
-    // Bersihkan kelas ketika animasi filter selesai atau dibatalkan.
     function selesai(event) {
       if (event.animationName === "masuk-filter") bersihkan(event.target);
     }
@@ -434,48 +414,33 @@
     });
   }
 
-  // Kursor, magnet, dan pratinjau memakai posisi mouse dan jadwal gambar yang sama.
+  // Semua efek penunjuk berbagi posisi mouse dan satu jadwal gambar.
   const pelukis = [];
   let framePenunjuk = 0;
   let mouse = null;
 
-  // Jalankan frame berikutnya hanya selama ada efek yang masih bergerak.
   function jadwalkanPenunjuk() {
     if (framePenunjuk) return;
-
-    framePenunjuk = window.requestAnimationFrame(() => {
+    framePenunjuk = requestAnimationFrame(() => {
       framePenunjuk = 0;
       let bergerak = false;
-
       for (const gambar of pelukis) {
         if (gambar(mouse)) bergerak = true;
       }
-
       if (bergerak) jadwalkanPenunjuk();
     });
   }
 
-  // Simpan posisi mouse terakhir untuk semua efek yang mengikutinya.
   function siapkanPenunjuk() {
     document.addEventListener("pointermove", (event) => {
-      const bolehBergerak = event.pointerType === "mouse" &&
-        pointerHalus.matches && !gerakanMinimal.matches;
-
-      if (bolehBergerak && event.target instanceof Element) {
-        mouse = { x: event.clientX, y: event.clientY, target: event.target };
-      } else {
-        mouse = null;
-      }
-
+      mouse = event.pointerType === "mouse" && pointerHalus.matches && !gerakanMinimal.matches
+        ? { x: event.clientX, y: event.clientY, target: event.target } : null;
       jadwalkanPenunjuk();
     }, { passive: true });
-
-    // Kembalikan efek ke posisi awal saat mouse atau halaman kehilangan fokus.
     function reset() {
       mouse = null;
       jadwalkanPenunjuk();
     }
-
     akar.addEventListener("pointerleave", reset);
     window.addEventListener("blur", reset);
     window.addEventListener("pagehide", reset);
@@ -484,291 +449,163 @@
     gerakanMinimal.addEventListener("change", reset);
   }
 
-  // Tampilkan lingkaran kecil setelah mouse pertama kali bergerak.
+  // Lingkaran mengikuti mouse dengan sedikit jeda.
   function siapkanKursor() {
-    let kursor = null;
+    let kursor;
     let x = 0;
     let y = 0;
-
     pelukis.push((pos) => {
       if (!pos) {
         kursor?.classList.remove("terlihat");
         return false;
       }
-
       if (!kursor) {
         kursor = document.createElement("span");
         kursor.className = "kursor-kecil";
         kursor.setAttribute("aria-hidden", "true");
         document.body.append(kursor);
       }
-
       if (!kursor.classList.contains("terlihat")) {
         x = pos.x;
         y = pos.y;
       }
-
       x += (pos.x - x) * 0.24;
       y += (pos.y - y) * 0.24;
-
       kursor.style.translate = `${x}px ${y}px`;
       kursor.classList.add("terlihat");
-
-      const kontrol = pos.target.closest("a[href], button:enabled, .galeri-unggulan figure");
-      kursor.classList.toggle("di-atas-kontrol", Boolean(kontrol));
-
+      kursor.classList.toggle("di-atas-kontrol", Boolean(pos.target.closest("a[href], button:enabled, .galeri-unggulan figure")));
       return Math.hypot(pos.x - x, pos.y - y) > 0.4;
     });
   }
 
-  // Geser tombol Hubungi saya dan Kirim pesan maksimal delapan piksel ke arah mouse.
+  // Geser dua tombol utama ke arah mouse lalu kembalikan dengan halus.
   function siapkanMagnet() {
-    const tombolUtama = document.querySelectorAll(
-      ".hero .btn-outline-primary, #form-kontak button[type=submit]"
-    );
-
-    for (const tombol of tombolUtama) {
+    for (const tombol of document.querySelectorAll(".hero .btn-outline-primary, #form-kontak button[type=submit]")) {
       let x = 0;
       let y = 0;
-
       pelukis.push((pos) => {
-        let tujuanX = 0;
-        let tujuanY = 0;
-
+        let tx = 0;
+        let ty = 0;
         if (pos && !tombol.disabled) {
           const kotak = tombol.getBoundingClientRect();
-
-          // Kurangi pergeseran lama agar pusat tombol tidak ikut mengejar mouse.
           const dx = pos.x - (kotak.left + kotak.width / 2 - x);
           const dy = pos.y - (kotak.top + kotak.height / 2 - y);
           const jarak = Math.hypot(dx, dy);
           const faktor = Math.max(0, 1 - jarak / 80) * 8 / Math.max(1, jarak);
-
-          tujuanX = dx * faktor;
-          tujuanY = dy * faktor;
+          tx = dx * faktor;
+          ty = dy * faktor;
         }
-
-        x += (tujuanX - x) * 0.25;
-        y += (tujuanY - y) * 0.25;
-
-        if (gerakanMinimal.matches || Math.hypot(tujuanX - x, tujuanY - y) < 0.1) {
-          x = tujuanX;
-          y = tujuanY;
+        x += (tx - x) * 0.25;
+        y += (ty - y) * 0.25;
+        if ((!pos && gerakanMinimal.matches) || Math.hypot(tx - x, ty - y) < 0.1) {
+          x = tx;
+          y = ty;
         }
-
         tombol.style.translate = x || y ? `${x}px ${y}px` : "";
-        return x !== tujuanX || y !== tujuanY;
+        return x !== tx || y !== ty;
       });
     }
   }
 
-  // Bungkus teks tautan dan tombol agar label bisa berguling tanpa menggandakan bacaannya.
-  function siapkanGuling() {
-    const sasaran = document.querySelectorAll(
-      ".navbar .nav-link, [data-tema-toggle], .tautan-kontak, .btn-outline-primary, button[data-filter]"
-    );
-
-    for (const tombol of sasaran) {
-      if (tombol.closest(".modal, .toast, .carousel, #penanda-bagian, #progress-scroll")) {
-        continue;
+  // Aktifkan sapuan warna pada tombol outline di luar komponen khusus.
+  function siapkanSapuan() {
+    for (const tombol of document.querySelectorAll(".btn-outline-primary")) {
+      if (!tombol.closest(".modal, .toast, .carousel, #penanda-bagian")) {
+        tombol.classList.add("sapuan");
       }
-
-      if (tombol.matches(".btn-outline-primary")) tombol.classList.add("sapuan");
-
-      const label = tombol.querySelector("[data-label-salin], .nilai-kontak") || tombol;
-
-      // Bungkus simpul teks saja agar ikon dan angka pada filter tetap tersedia.
-      function bungkus() {
-        if (label.closest('[aria-busy="true"]') || label.querySelector(".guling")) return;
-
-        const teks = Array.from(label.childNodes).find((simpul) => {
-          return simpul.nodeType === Node.TEXT_NODE && simpul.textContent.trim();
-        });
-        if (!teks) return;
-
-        const masker = document.createElement("span");
-        masker.className = "guling";
-
-        const asli = document.createElement("span");
-        asli.className = "guling__asli";
-        asli.textContent = teks.textContent.trim();
-
-        const salinan = asli.cloneNode(true);
-        salinan.className = "guling__salinan";
-        salinan.setAttribute("aria-hidden", "true");
-
-        masker.append(asli, salinan);
-
-        // Pertahankan spasi di samping angka filter atau ikon tombol.
-        const isiAwal = teks.textContent;
-        const awal = isiAwal.match(/^\s*/)[0];
-        const akhir = isiAwal.match(/\s*$/)[0];
-        teks.replaceWith(awal, masker, akhir);
-      }
-
-      bungkus();
-
-      // main.js bisa mengganti label menjadi Mode gelap, Tersalin, atau Mengirim...
-      const pengamat = new MutationObserver(bungkus);
-      pengamat.observe(label, { childList: true });
     }
   }
 
-  // Gunakan satu gambar mengambang untuk semua baris pada indeks proyek.
+  // Tampilkan satu gambar untuk baris aktif, termasuk saat dijelajahi dengan Tab.
   function siapkanPratinjau() {
     const daftar = document.getElementById("indeks-proyek");
     if (!daftar) return;
-
-    const desktop = window.matchMedia(
-      "(min-width: 992px) and (hover: hover) and (pointer: fine)"
-    );
-
+    const desktop = matchMedia("(min-width: 992px) and (hover: hover) and (pointer: fine)");
     const panel = document.createElement("figure");
     panel.className = "pratinjau-proyek";
     panel.setAttribute("aria-hidden", "true");
-
     const gambar = document.createElement("img");
     gambar.alt = "";
     panel.append(gambar);
     document.body.append(panel);
-
     const cache = new Map();
-    let aktif = null;
-    let keyboard = false;
-    let baru = false;
-    let x = 0;
-    let y = 0;
-    let kemiringan = 0;
-
-    // Muat gambar pertama setiap proyek ketika pratinjau desktop bisa dipakai.
-    function muatAwal() {
-      if (!desktop.matches || gerakanMinimal.matches) return;
-
-      for (const baris of daftar.querySelectorAll(".baris-proyek")) {
-        const path = baris.dataset.gambar?.split(",")[0]?.trim();
-
-        if (path && !cache.has(path)) {
-          const foto = new Image();
-          foto.src = path;
-          cache.set(path, foto);
-        }
+    for (const baris of daftar.querySelectorAll(".baris-proyek")) {
+      const path = baris.dataset.gambar?.split(",")[0]?.trim();
+      if (path && !cache.has(path)) {
+        const foto = new Image();
+        foto.src = path;
+        cache.set(path, foto);
       }
     }
-
-    // Tandai baris aktif dan muat gambarnya ke dalam panel.
+    let aktif = null;
+    let keyboard = false;
+    let x = 0;
+    let y = 0;
+    let baru = false;
+    let tilt = 0;
     function pilih(baris) {
-      if (!desktop.matches || gerakanMinimal.matches || baris?.closest(".d-none, [hidden]")) {
-        baris = null;
-      }
-
+      if (!desktop.matches || gerakanMinimal.matches || baris?.closest(".d-none,[hidden]")) baris = null;
       if (aktif === baris) return;
-
       aktif?.classList.remove("is-aktif");
       aktif = baris;
       daftar.classList.toggle("ada-aktif", Boolean(aktif));
       panel.classList.remove("terlihat");
-
       if (aktif) {
         aktif.classList.add("is-aktif");
         const path = aktif.dataset.gambar?.split(",")[0]?.trim();
         if (path) gambar.src = path;
         baru = true;
       }
-
       jadwalkanPenunjuk();
     }
-
     gambar.onload = () => {
       if (aktif && desktop.matches && !gerakanMinimal.matches) {
-        // Mulai lagi efek tersingkap saat pengguna pindah ke proyek lain.
         void panel.offsetWidth;
         panel.classList.add("terlihat");
       }
     };
-
     gambar.onerror = () => panel.classList.remove("terlihat");
-
-    daftar.addEventListener("pointermove", (event) => {
-      if (!(event.target instanceof Element)) return;
-
+    daftar.addEventListener("pointermove", event => {
       keyboard = false;
       pilih(event.pointerType === "mouse" ? event.target.closest(".baris-proyek") : null);
     }, { passive: true });
-
-    daftar.addEventListener("pointerleave", () => {
-      if (!keyboard) pilih(null);
-    });
-
-    daftar.addEventListener("focusin", (event) => {
-      if (!(event.target instanceof Element)) return;
-
+    daftar.addEventListener("pointerleave", () => { if (!keyboard) pilih(null); });
+    daftar.addEventListener("focusin", event => {
       if (event.target.matches(":focus-visible")) {
         keyboard = true;
         pilih(event.target.closest(".baris-proyek"));
       }
     });
-
-    daftar.addEventListener("focusout", (event) => {
+    daftar.addEventListener("focusout", event => {
       if (!daftar.contains(event.relatedTarget)) pilih(null);
     });
-
-    // Tutup pratinjau saat daftar berpindah, disaring, atau tertutup modal.
-    function tutup() {
-      pilih(null);
-    }
-
+    function tutup() { pilih(null); }
     document.addEventListener("show.bs.modal", tutup);
     document.querySelector(".filter-proyek")?.addEventListener("click", tutup);
     window.addEventListener("scroll", tutup, { passive: true });
     window.addEventListener("blur", tutup);
-
-    // Periksa kembali ukuran layar dan preferensi gerakan yang baru.
-    function aturPerangkat() {
-      tutup();
-      muatAwal();
-    }
-
-    desktop.addEventListener("change", aturPerangkat);
-    gerakanMinimal.addEventListener("change", aturPerangkat);
-    muatAwal();
-
-    pelukis.push((pos) => {
+    desktop.addEventListener("change", tutup);
+    gerakanMinimal.addEventListener("change", tutup);
+    pelukis.push(pos => {
       if (!aktif) return false;
-
-      if (!pos && !keyboard) {
-        tutup();
-        return false;
-      }
-
       const kotak = aktif.getBoundingClientRect();
+      if (!pos && !keyboard) { tutup(); return false; }
       const px = keyboard ? kotak.right - panel.offsetWidth : pos.x;
       const py = keyboard ? kotak.top : pos.y;
-
-      // Jaga gambar tetap di dalam layar, termasuk saat mouse mendekati tepi.
-      const tujuanX = Math.max(8, Math.min(window.innerWidth - panel.offsetWidth - 8, px + 24));
-      const tujuanY = Math.max(8, Math.min(window.innerHeight - panel.offsetHeight - 8, py + 18));
-
-      if (baru) {
-        x = tujuanX;
-        y = tujuanY;
-        baru = false;
-      }
-
-      const dx = (tujuanX - x) * 0.18;
+      const tx = Math.max(8, Math.min(innerWidth - panel.offsetWidth - 8, px + 24));
+      const ty = Math.max(8, Math.min(innerHeight - panel.offsetHeight - 8, py + 18));
+      if (baru) { x = tx; y = ty; baru = false; }
+      const dx = (tx - x) * 0.18;
       x += dx;
-      y += (tujuanY - y) * 0.18;
-
-      const sudut = Math.min(6, Math.max(-6, dx * 0.35));
-      kemiringan += (sudut - kemiringan) * 0.25;
-
+      y += (ty - y) * 0.18;
+      tilt += (Math.min(6, Math.max(-6, dx * 0.35)) - tilt) * 0.25;
       panel.style.translate = `${x}px ${y}px`;
-      panel.style.rotate = `${kemiringan}deg`;
-
-      return Math.hypot(tujuanX - x, tujuanY - y) > 0.3 || Math.abs(kemiringan) > 0.1;
+      panel.style.rotate = `${tilt}deg`;
+      return Math.hypot(tx - x, ty - y) > 0.3 || Math.abs(tilt) > 0.1;
     });
   }
 
-  // Jalankan sapuan layar untuk tautan ke halaman HTML di dalam situs.
+  // Menjalankan sapuan keluar dan masuk hanya pada navigasi HTML dalam situs yang sama.
   function siapkanTransisiHalaman() {
     const panel = document.createElement("div");
     panel.className = "panel-halaman";
@@ -779,7 +616,6 @@
     let timer = 0;
     let frame = 0;
 
-    // Hapus alamat tujuan yang disimpan untuk animasi masuk.
     function hapusPenanda() {
       try {
         sessionStorage.removeItem(kunciTransisi);
@@ -788,7 +624,6 @@
       }
     }
 
-    // Lepas panel ketika navigasi selesai, dibatalkan, atau dipulihkan lewat Back.
     function pulihkan() {
       window.clearTimeout(timer);
       window.cancelAnimationFrame(frame);
@@ -797,7 +632,6 @@
       panel.classList.remove("panel-menutup", "panel-membuka");
     }
 
-    // Buka halaman tujuan setelah sapuan penutup selesai.
     function pindah() {
       if (!tujuan) return;
 
@@ -812,17 +646,18 @@
       }
 
       window.location.assign(alamat.href);
+      // Jika perpindahan dibatalkan browser, lepaskan penutup halaman.
       timer = window.setTimeout(pulihkan, 1200);
     }
 
     hapusPenanda();
 
     if (akar.classList.contains("masuk-transisi") && !gerakanMinimal.matches) {
+      // Penutup awal dari head diganti panel pada frame yang sama.
       frame = window.requestAnimationFrame(() => {
         panel.classList.add("panel-membuka");
         akar.classList.remove("masuk-transisi");
       });
-
       timer = window.setTimeout(pulihkan, 1200);
     } else {
       pulihkan();
@@ -830,7 +665,6 @@
 
     panel.addEventListener("animationend", (event) => {
       if (event.animationName === "tutup-halaman") pindah();
-
       if (event.animationName === "buka-halaman") {
         panel.classList.remove("panel-membuka");
       }
@@ -839,7 +673,6 @@
     document.addEventListener("click", (event) => {
       if (gerakanMinimal.matches || event.defaultPrevented || event.button !== 0) return;
       if (event.ctrlKey || event.shiftKey || event.metaKey || event.altKey) return;
-      if (!(event.target instanceof Element)) return;
 
       const tautan = event.target.closest("a[href]");
       if (!tautan || tautan.closest("[data-bs-toggle]") || tautan.hasAttribute("download")) return;
@@ -847,7 +680,7 @@
 
       const alamat = new URL(tautan.href, window.location.href);
       if (!["http:", "https:", "file:"].includes(alamat.protocol)) return;
-      if (alamat.origin !== window.location.origin || alamat.href.includes("#")) return;
+      if (alamat.origin !== location.origin || alamat.href.includes("#")) return;
       if (!alamat.pathname.toLowerCase().endsWith(".html")) return;
 
       event.preventDefault();
@@ -877,7 +710,7 @@
     });
   }
 
-  // Mulai setiap fitur secara terpisah agar fitur lain tetap berjalan jika satu gagal.
+  // Semua fitur dimulai dari sini setelah HTML siap.
   function inisialisasi() {
     for (const fitur of [
       siapkanHero,
@@ -888,9 +721,9 @@
       siapkanPenunjuk,
       siapkanKursor,
       siapkanMagnet,
-      siapkanGuling,
+      siapkanSapuan,
       siapkanPratinjau,
-      siapkanTransisiHalaman
+      siapkanTransisiHalaman,
     ]) {
       try {
         fitur();
