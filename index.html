@@ -1,29 +1,67 @@
 <!doctype html>
+<!-- Beranda portofolio Bintang Perdana: navigasi, profil, skill, perjalanan belajar, dan proyek pilihan. -->
 <html lang="id" data-bs-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Beranda | Bintang Perdana</title>
-  <meta name="description" content="Portofolio Bintang Perdana, mahasiswa Sistem Informasi Universitas Pamulang. Kenali perjalanan belajar dan proyek aplikasi stok gadget StokKu.">
+
+  <title>Bintang Perdana | Portofolio Mahasiswa Sistem Informasi</title>
+  <meta name="description" content="Portofolio Bintang Perdana, mahasiswa semester 5 Sistem Informasi di Universitas Pamulang. Baca perjalanan belajarnya dan kenali aplikasi stok gadget StokKu.">
+  <meta name="theme-color" content="#15161B" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F7F2E9" media="(prefers-color-scheme: light)">
+
+  <meta property="og:title" content="Bintang Perdana | Portofolio Mahasiswa Sistem Informasi">
+  <meta property="og:description" content="Perjalanan belajar Bintang Perdana di Universitas Pamulang dan proyek pilihannya, aplikasi mobile StokKu untuk pencatatan stok gadget.">
+  <meta property="og:type" content="website">
 
   <script>
-    // Terapkan pilihan tema sebelum browser menampilkan halaman.
-    document.documentElement.classList.add("js");
+    // Terapkan tema dan periksa tujuan transisi sebelum halaman tampil.
+    (() => {
+      const akar = document.documentElement;
+      akar.classList.add("js");
 
-    try {
-      const tema = localStorage.getItem("tema");
-      if (tema === "light" || tema === "dark") {
-        document.documentElement.setAttribute("data-bs-theme", tema);
+      try {
+        const tema = localStorage.getItem("tema");
+        if (tema === "light" || tema === "dark") {
+          akar.setAttribute("data-bs-theme", tema);
+        }
+      } catch {
+        // Gunakan tema gelap dari HTML jika penyimpanan diblokir.
       }
-    } catch {
-      // Tema gelap dari HTML tetap dipakai jika penyimpanan diblokir.
-    }
+
+      try {
+        const kunci = "portofolio-tujuan-transisi";
+        const tujuan = sessionStorage.getItem(kunci);
+        sessionStorage.removeItem(kunci);
+
+        const kurangiGerakan = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (tujuan === window.location.href && !kurangiGerakan) {
+          akar.classList.add("masuk-transisi");
+
+          // Buka halaman setelah 1,2 detik meskipun animasi.js gagal dimuat.
+          window.setTimeout(() => akar.classList.remove("masuk-transisi"), 1200);
+        }
+      } catch {
+        // Halaman tetap bisa dibuka jika penyimpanan sesi tidak tersedia.
+      }
+    })();
   </script>
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Ctext%20x='32'%20y='52'%20text-anchor='middle'%20font-family='Georgia,serif'%20font-size='58'%20font-weight='700'%20fill='%23C2491D'%3EB%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700&amp;family=Instrument+Sans:wght@400;600&amp;display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/variabel.css">
+  <link rel="stylesheet" href="css/dasar.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/tombol.css">
+  <link rel="stylesheet" href="css/form.css">
+  <link rel="stylesheet" href="css/modal-carousel.css">
+  <link rel="stylesheet" href="css/kursor-progres.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/animasi.css">
+  <link rel="stylesheet" href="css/beranda.css">
 </head>
 <body data-bs-spy="scroll" data-bs-target="#penanda-bagian">
   <a class="visually-hidden-focusable position-absolute top-0 start-0 z-3 bg-body p-2"
@@ -39,7 +77,7 @@
               data-bs-toggle="collapse" data-bs-target="#menu-utama"
               aria-controls="menu-utama" aria-expanded="false"
               aria-label="Buka atau tutup menu">
-        <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon" aria-hidden="true"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="menu-utama">
@@ -56,17 +94,16 @@
         </ul>
 
         <button class="btn btn-outline-secondary my-2 my-md-0" type="button"
-                id="tombol-tema" aria-label="Mode gelap" aria-pressed="true">
+                id="tombol-tema" data-tema-toggle aria-pressed="true">
           Mode terang
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- ScrollSpy menandai tautan sesuai bagian Beranda yang sedang dibaca. -->
   <nav id="penanda-bagian" class="nav flex-column d-none d-lg-flex"
        aria-label="Bagian Beranda">
-    <a class="nav-link" href="#hero" aria-label="Ke bagian Hero"></a>
+    <a class="nav-link" href="#hero" aria-label="Ke bagian profil Bintang Perdana"></a>
     <a class="nav-link" href="#tentang" aria-label="Ke bagian Tentang"></a>
     <a class="nav-link" href="#skill" aria-label="Ke bagian Skill"></a>
     <a class="nav-link" href="#perjalanan" aria-label="Ke bagian Perjalanan belajar"></a>
@@ -78,7 +115,7 @@
       <div class="row align-items-lg-stretch gy-4 gy-lg-0">
         <div class="col-12 col-lg-6 hero-kiri">
           <div class="hero-teks">
-            <h1 id="nama-bintang">Bintang Perdana</h1>
+            <h1 id="nama-bintang" aria-label="Bintang Perdana">Bintang Perdana</h1>
             <p class="lead mb-1">Saya mahasiswa Sistem Informasi di Universitas Pamulang.</p>
             <span class="d-block" id="teks-ketik"></span>
 
@@ -95,7 +132,8 @@
 
         <div class="col-12 col-lg-6 hero-kanan">
           <img class="img-fluid foto-hero" src="img/foto-profil.jpg"
-               alt="Foto profil Bintang Perdana">
+               alt="Foto profil Bintang Perdana" width="360" height="240"
+               fetchpriority="high" decoding="async">
         </div>
       </div>
     </header>
@@ -207,6 +245,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script src="js/main.js"></script>
-  <script src="js/animasi.js"></script>
+  <script src="js/animasi.js" defer></script>
 </body>
 </html>

@@ -1,44 +1,137 @@
+// Mengatur tema, filter proyek, modal, galeri, form kontak, dan kontrol scroll.
 "use strict";
 
-// Mengganti tema Bootstrap dan menyimpan pilihan pengguna.
-function siapkanTema() {
-  const halaman = document.documentElement;
-  const tombol = document.getElementById("tombol-tema");
-  if (!tombol) return;
+// Hubungkan tombol tema di semua halaman lewat satu pendengar klik.
+function inisialisasiTema() {
+  const akar = document.documentElement;
+  const selector = "[data-tema-toggle]";
+  const gerakanMinimal = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let timer = 0;
+  let transisi = null;
 
-  // Status tombol mengikuti tema yang sudah diterapkan oleh skrip di head.
+  // Sesuaikan teks dan status tombol dengan tema halaman.
   function perbaruiTombol() {
-    const gelap = halaman.getAttribute("data-bs-theme") === "dark";
-    tombol.textContent = gelap ? "Mode terang" : "Mode gelap";
-    tombol.setAttribute("aria-pressed", String(gelap));
+    const gelap = akar.dataset.bsTheme === "dark";
+
+    for (const tombol of document.querySelectorAll(selector)) {
+      tombol.textContent = gelap ? "Mode terang" : "Mode gelap";
+      tombol.setAttribute("aria-pressed", String(gelap));
+    }
   }
 
-  perbaruiTombol();
-
-  tombol.addEventListener("click", () => {
-    const gelap = halaman.getAttribute("data-bs-theme") === "dark";
-    const temaBaru = gelap ? "light" : "dark";
-
-    halaman.setAttribute("data-bs-theme", temaBaru);
+  // Terapkan pilihan pengguna dan simpan jika penyimpanan lokal tersedia.
+  function terapkan(tema) {
+    akar.dataset.bsTheme = tema;
     perbaruiTombol();
 
     try {
-      localStorage.setItem("tema", temaBaru);
+      localStorage.setItem("tema", tema);
     } catch {
-      // Tema tetap berlaku di halaman ini jika penyimpanan diblokir.
+      // Tema tetap berlaku selama halaman ini terbuka.
     }
+  }
+
+  // Gunakan transisi warna CSS jika efek lingkaran tidak tersedia.
+  function gantiDenganWarna(tema) {
+    window.clearTimeout(timer);
+    akar.classList.toggle("tema-berpindah", !gerakanMinimal.matches);
+    terapkan(tema);
+
+    timer = window.setTimeout(() => {
+      akar.classList.remove("tema-berpindah");
+    }, 500);
+  }
+
+  // Buka tema baru dari tengah tombol sampai ke sudut layar terjauh.
+  async function gantiTema(tombol) {
+    if (transisi) return;
+
+    const tema = akar.dataset.bsTheme === "dark" ? "light" : "dark";
+
+    if (gerakanMinimal.matches || !document.startViewTransition || !akar.animate) {
+      gantiDenganWarna(tema);
+      return;
+    }
+
+    const kotak = tombol.getBoundingClientRect();
+    const x = kotak.left + kotak.width / 2;
+    const y = kotak.top + kotak.height / 2;
+    const radius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    try {
+      transisi = document.startViewTransition(() => terapkan(tema));
+      await transisi.ready;
+
+      if (!gerakanMinimal.matches) {
+        akar.animate({
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${radius}px at ${x}px ${y}px)`
+          ]
+        }, {
+          duration: 600,
+          easing: "ease-in-out",
+          pseudoElement: "::view-transition-new(root)"
+        });
+      }
+    } catch {
+      transisi?.skipTransition();
+
+      if (akar.dataset.bsTheme !== tema) {
+        gantiDenganWarna(tema);
+      }
+    } finally {
+      if (transisi) await transisi.finished;
+      transisi = null;
+    }
+  }
+
+  gerakanMinimal.addEventListener("change", () => {
+    if (gerakanMinimal.matches) {
+      akar.classList.remove("tema-berpindah");
+      transisi?.skipTransition();
+    }
+  });
+
+  perbaruiTombol();
+
+  // Baca kembali pilihan tema saat pengguna kembali lewat tombol Back.
+  window.addEventListener("pageshow", () => {
+    try {
+      const tema = localStorage.getItem("tema");
+
+      if (tema === "light" || tema === "dark") {
+        akar.dataset.bsTheme = tema;
+      }
+    } catch {
+      // Gunakan tema yang sudah diterapkan pada halaman.
+    }
+
+    perbaruiTombol();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+
+    const tombol = event.target.closest(selector);
+    if (tombol) gantiTema(tombol);
   });
 }
 
-// Menampilkan proyek sesuai kategori tombol yang dipilih.
+// Saring kelima proyek dan hitung baris yang terlihat pada bagian Proyek lainnya.
 function siapkanFilterProyek() {
   const daftar = document.getElementById("daftar-proyek");
   const tombolFilter = document.querySelectorAll("button[data-filter]");
   if (!daftar || tombolFilter.length === 0) return;
 
+  const indeks = document.getElementById("indeks-proyek");
+  const jumlah = document.getElementById("jumlah-lainnya");
   const proyek = daftar.querySelectorAll("article[data-kategori]");
 
-  // Class active dan aria-pressed menandai kategori yang sedang dipakai.
+  // Pertahankan nomor asli setiap proyek saat kategori berubah.
   function pilihKategori(tombolPilihan) {
     const kategori = tombolPilihan.dataset.filter;
 
@@ -52,6 +145,13 @@ function siapkanFilterProyek() {
       const cocok = kategori === "Semua" || artikel.dataset.kategori === kategori;
       artikel.classList.toggle("d-none", !cocok);
     }
+
+    if (indeks && jumlah) {
+      // StokKu berada di luar indeks, jadi tidak masuk hitungan ini.
+      const total = indeks.querySelectorAll("article:not(.d-none)").length;
+      jumlah.textContent = String(total);
+      indeks.hidden = total === 0;
+    }
   }
 
   for (const tombol of tombolFilter) {
@@ -59,13 +159,12 @@ function siapkanFilterProyek() {
   }
 }
 
-// Menyiapkan satu carousel yang isinya dapat diganti setiap kali proyek dibuka.
+// Siapkan satu carousel untuk semua proyek yang ditampilkan di modal.
 function siapkanGaleriProyek(modal) {
   const carousel = modal.querySelector("#carousel-proyek");
   const wadah = modal.querySelector("#modal-gambar");
   const indikator = modal.querySelector("#indikator-gambar");
   const pesanKosong = modal.querySelector("#galeri-kosong");
-
   if (!carousel || !wadah || !indikator || !pesanKosong) return null;
 
   const sebelumnya = carousel.querySelector(".carousel-control-prev");
@@ -75,7 +174,7 @@ function siapkanGaleriProyek(modal) {
   let sedangBergeser = false;
   let dataMenunggu = null;
 
-  // Nomor indikator selalu dihitung dari gambar yang masih tersedia.
+  // Sesuaikan indikator dan tombol navigasi dengan jumlah gambar yang tersedia.
   function perbaruiNavigasi() {
     const slide = Array.from(wadah.children);
     const banyakGambar = slide.length > 1;
@@ -83,15 +182,13 @@ function siapkanGaleriProyek(modal) {
     const tombolBaru = document.createDocumentFragment();
 
     slide.forEach((item, indeks) => {
-      const aktif = item.classList.contains("active");
       const tombol = document.createElement("button");
-
       tombol.type = "button";
       tombol.setAttribute("data-bs-target", "#carousel-proyek");
       tombol.setAttribute("data-bs-slide-to", String(indeks));
       tombol.setAttribute("aria-label", `Tampilkan gambar ${indeks + 1} dari ${slide.length}`);
 
-      if (aktif) {
+      if (item.classList.contains("active")) {
         tombol.classList.add("active");
         tombol.setAttribute("aria-current", "true");
       }
@@ -107,18 +204,17 @@ function siapkanGaleriProyek(modal) {
     pesanKosong.classList.toggle("d-none", !kosong);
   }
 
-  // Hapus slide yang gambarnya gagal dimuat setelah transisi Bootstrap selesai.
+  // Tunggu perpindahan slide selesai sebelum menghapus gambar yang gagal dimuat.
   function bersihkanGambarGagal() {
     if (sedangBergeser) return;
 
     const gagal = wadah.querySelectorAll('[data-gagal="true"]');
-    if (!gagal.length) return;
+    if (gagal.length === 0) return;
 
     for (const item of gagal) {
       item.remove();
     }
 
-    // Jika gambar aktif gagal, tampilkan gambar pertama yang tersisa.
     if (!wadah.querySelector(".active") && wadah.firstElementChild) {
       wadah.firstElementChild.classList.add("active");
     }
@@ -126,7 +222,7 @@ function siapkanGaleriProyek(modal) {
     perbaruiNavigasi();
   }
 
-  // Buat gambar dan pasang penanganan kesalahan sebelum memberi alamat src.
+  // Buat slide dari alamat gambar dan teks alternatif yang tersimpan di HTML.
   function buatSlide(path, teksAlt, pertama) {
     const item = document.createElement("div");
     item.className = "carousel-item text-center";
@@ -138,7 +234,7 @@ function siapkanGaleriProyek(modal) {
     gambar.loading = "lazy";
 
     gambar.onerror = () => {
-      // Abaikan hasil pemuatan lama jika pengguna sudah membuka proyek lain.
+      // Abaikan gambar lama jika pengguna sudah membuka proyek lain.
       if (item.parentElement !== wadah) return;
 
       gambar.classList.add("d-none");
@@ -151,14 +247,13 @@ function siapkanGaleriProyek(modal) {
     return item;
   }
 
-  // Mulai kembali dari gambar pertama, termasuk saat proyek yang sama dibuka ulang.
+  // Isi ulang galeri dan mulai dari gambar pertama setiap kali modal dibuka.
   function isiGaleri(data) {
     if (sedangBergeser) {
       dataMenunggu = data;
       return;
     }
 
-    // Buang posisi aktif yang disimpan Bootstrap untuk proyek sebelumnya.
     const galeriLama = bootstrap.Carousel.getInstance(carousel);
     if (galeriLama) galeriLama.dispose();
 
@@ -179,7 +274,6 @@ function siapkanGaleriProyek(modal) {
     perbaruiNavigasi();
 
     if (sumber.length > 1) {
-      // Pengunjung dapat memakai panah, indikator, keyboard, atau usapan jari.
       bootstrap.Carousel.getOrCreateInstance(carousel, {
         interval: false,
         ride: false,
@@ -207,7 +301,7 @@ function siapkanGaleriProyek(modal) {
   return isiGaleri;
 }
 
-// Mengisi modal Bootstrap dari artikel yang tombol Lihat detail-nya diklik.
+// Isi modal Bootstrap dari artikel yang dipilih pengguna.
 function siapkanModalProyek() {
   const modal = document.getElementById("modal-proyek");
   if (!modal) return;
@@ -228,7 +322,7 @@ function siapkanModalProyek() {
   const isiGaleri = siapkanGaleriProyek(modal);
   if (!isiGaleri) return;
 
-  // Kosongkan alamat lama agar tautan selalu sesuai dengan proyek yang terbuka.
+  // Hapus alamat proyek sebelumnya jika proyek berikutnya tidak punya tautan.
   function aturTautan(tautan, alamat) {
     if (alamat) {
       tautan.href = alamat;
@@ -241,6 +335,7 @@ function siapkanModalProyek() {
 
   modal.addEventListener("show.bs.modal", (event) => {
     const artikel = event.relatedTarget?.closest("article[data-kategori]");
+
     if (!artikel) {
       event.preventDefault();
       return;
@@ -255,7 +350,6 @@ function siapkanModalProyek() {
     catatan.textContent = data.catatan || "";
     catatan.classList.toggle("d-none", !data.catatan);
 
-    // Figma adalah alat desain app-food. NusaEco belum memiliki data teknologi.
     labelTeknologi.textContent = data.kategori === "Desain" ? "Alat" : "Teknologi";
     teknologi.textContent = data.teknologi || "";
     labelTeknologi.classList.toggle("d-none", !data.teknologi);
@@ -267,7 +361,87 @@ function siapkanModalProyek() {
   });
 }
 
-// Memeriksa form Kontak dan menampilkan hasil dengan gaya validasi Bootstrap.
+// Coba salin teks lewat kolom sementara jika API clipboard tidak tersedia.
+function salinDenganKolomSementara(teks) {
+  const fokusAwal = document.activeElement;
+  const kolom = document.createElement("textarea");
+
+  kolom.value = teks;
+  kolom.readOnly = true;
+  kolom.tabIndex = -1;
+  kolom.setAttribute("aria-label", "Alamat email untuk disalin");
+  kolom.className = "visually-hidden position-fixed";
+  document.body.append(kolom);
+
+  try {
+    kolom.focus({ preventScroll: true });
+    kolom.select();
+    kolom.setSelectionRange(0, kolom.value.length);
+    return document.execCommand("copy");
+  } catch {
+    return false;
+  } finally {
+    kolom.remove();
+
+    if (fokusAwal instanceof HTMLElement) {
+      fokusAwal.focus({ preventScroll: true });
+    }
+  }
+}
+
+// Salin alamat email dan umumkan hasilnya lewat tombol dan toast Bootstrap.
+function siapkanSalinEmail() {
+  const tombol = document.getElementById("salin-email");
+  const tautan = document.getElementById("alamat-email");
+  const elemenToast = document.getElementById("toast-salin-email");
+  if (!tombol || !tautan || !elemenToast) return;
+
+  const isiToast = elemenToast.querySelector(".toast-body");
+  if (!isiToast) return;
+
+  const label = tombol.querySelector("[data-label-salin]");
+  let timerLabel = 0;
+  const toast = bootstrap.Toast.getOrCreateInstance(elemenToast);
+  const tujuan = tautan.getAttribute("href");
+  if (!tujuan || !tujuan.startsWith("mailto:")) return;
+
+  // Ambil alamat dari mailto agar teks dekoratif tidak ikut tersalin.
+  const alamat = tujuan.slice("mailto:".length).split("?")[0];
+
+  tombol.addEventListener("click", async () => {
+    let tersalin = false;
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(alamat);
+        tersalin = true;
+      }
+    } catch {
+      // Coba cara cadangan jika izin clipboard ditolak.
+    }
+
+    if (!tersalin) {
+      tersalin = salinDenganKolomSementara(alamat);
+    }
+
+    isiToast.textContent = tersalin
+      ? "Email disalin."
+      : "Email belum tersalin. Pilih alamat email lalu salin secara manual.";
+
+    if (label && tersalin) {
+      window.clearTimeout(timerLabel);
+      label.textContent = "Tersalin";
+
+      timerLabel = window.setTimeout(() => {
+        label.textContent = "Salin email";
+      }, 1600);
+    }
+
+    toast.show();
+  });
+}
+
+// Periksa isi form dan tampilkan status pengiriman setelah semua kolom valid.
 function siapkanFormKontak() {
   const form = document.getElementById("form-kontak");
   const status = document.getElementById("status-form");
@@ -282,7 +456,7 @@ function siapkanFormKontak() {
   const semuaKolom = [nama, email, pesan];
   const polaEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // Spasi di awal dan akhir tidak dihitung sebagai isi nama atau pesan.
+  // Periksa isi setelah spasi di awal dan akhir disisihkan.
   function periksaKolom(kolom) {
     const nilai = kolom.value.trim();
     let kesalahan = "";
@@ -316,8 +490,10 @@ function siapkanFormKontak() {
     });
   }
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (tombol.disabled) return;
+
     status.classList.add("d-none");
 
     for (const kolom of semuaKolom) {
@@ -331,7 +507,23 @@ function siapkanFormKontak() {
       return;
     }
 
-    // Ini simulasi. Pengiriman sungguhan membutuhkan backend atau layanan form.
+    // Ini simulasi lokal. Pengiriman sungguhan memerlukan backend atau layanan form.
+    tombol.disabled = true;
+    tombol.setAttribute("aria-busy", "true");
+
+    // Simpan elemen label agar efek teks berguling bisa dipakai lagi setelah selesai.
+    const isiTombol = Array.from(tombol.childNodes);
+    const spinner = document.createElement("span");
+    spinner.className = "spinner-border spinner-border-sm me-2";
+    spinner.setAttribute("aria-hidden", "true");
+    tombol.replaceChildren(spinner, "Mengirim...");
+
+    await new Promise((selesai) => window.setTimeout(selesai, 700));
+
+    tombol.replaceChildren(...isiTombol);
+    tombol.removeAttribute("aria-busy");
+    tombol.disabled = false;
+
     form.reset();
     form.classList.remove("was-validated");
 
@@ -347,7 +539,7 @@ function siapkanFormKontak() {
   tombol.disabled = false;
 }
 
-// Mengisi garis di atas halaman sesuai bagian dokumen yang sudah digulir.
+// Isi garis di atas halaman sesuai bagian dokumen yang sudah digulir.
 function siapkanProgresScroll() {
   let bar = document.getElementById("progress-scroll");
 
@@ -378,7 +570,7 @@ function siapkanProgresScroll() {
   }
 }
 
-// Menampilkan tombol kembali ke atas setelah pengguna menggulir lebih dari 400 piksel.
+// Tampilkan tombol kembali ke atas setelah halaman digulir lebih dari 400 piksel.
 function siapkanKembaliKeAtas() {
   let tombol = document.getElementById("kembali-ke-atas");
 
@@ -393,7 +585,7 @@ function siapkanKembaliKeAtas() {
 
   const kurangiGerakan = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  // Tombol yang tersembunyi juga dilewati saat pengguna menekan Tab.
+  // Saat tersembunyi, tombol juga dilewati ketika pengguna menekan Tab.
   function perbaruiTombol() {
     tombol.style.display = window.scrollY > 400 ? "" : "none";
   }
@@ -413,11 +605,21 @@ function siapkanKembaliKeAtas() {
   window.addEventListener("pageshow", perbaruiTombol);
 }
 
+// Mulai dari tema. Jika satu fitur gagal disiapkan, lanjutkan ke fitur berikutnya.
 document.addEventListener("DOMContentLoaded", () => {
-  siapkanTema();
-  siapkanFilterProyek();
-  siapkanModalProyek();
-  siapkanFormKontak();
-  siapkanProgresScroll();
-  siapkanKembaliKeAtas();
+  for (const fitur of [
+    inisialisasiTema,
+    siapkanFilterProyek,
+    siapkanModalProyek,
+    siapkanFormKontak,
+    siapkanSalinEmail,
+    siapkanProgresScroll,
+    siapkanKembaliKeAtas
+  ]) {
+    try {
+      fitur();
+    } catch (galat) {
+      console.error(`Gagal memulai ${fitur.name}.`, galat);
+    }
+  }
 });

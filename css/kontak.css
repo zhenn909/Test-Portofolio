@@ -1,0 +1,93 @@
+/* Mengatur daftar kontak, tombol salin email, dan panel formulir.
+   Dipakai di halaman Kontak. Dimuat setelah animasi.css. */
+
+.tautan-kontak {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  min-width: 0;
+  padding-block: 0.2rem;
+  color: var(--warna-teks);
+  font: 400 clamp(1.55rem, 3vw, 2.45rem) / 1.2 var(--font-judul);
+  letter-spacing: -0.035em;
+  text-decoration: none;
+}
+
+#alamat-email {
+  font-size: clamp(1.1rem, 2.3vw, 1.9rem);
+  overflow-wrap: anywhere;
+}
+
+.nilai-kontak {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.panah-kontak {
+  display: inline-block;
+  color: var(--warna-tautan);
+  font-size: 0.65em;
+}
+
+.tautan-kontak::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background-color: var(--aksen);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.tautan-kontak:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.baris-kontak {
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.baris-kontak:first-child {
+  padding-top: 0;
+}
+
+#salin-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#form-kontak.panel-form {
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 20px;
+  background-color: var(--latar-form);
+  box-shadow: none;
+}
+
+#judul-form {
+  margin-bottom: 1.75rem;
+  font: 400 clamp(1.45rem, 2.5vw, 2rem) / 1.2 var(--font-judul);
+}
+
+@media (hover: hover) {
+  .tautan-kontak:hover {
+    color: var(--warna-tautan);
+  }
+
+  .tautan-kontak:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .tautan-kontak:hover .nilai-kontak {
+    transform: translateX(0.15rem);
+  }
+
+  .tautan-kontak:hover .panah-kontak {
+    transform: translateX(0.35rem);
+  }
+}

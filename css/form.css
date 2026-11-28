@@ -1,0 +1,42 @@
+/* Label, kolom, fokus, dan pesan validasi untuk formulir Kontak.
+   Dimuat di semua halaman setelah tombol.css. */
+
+.label-kontak,
+#form-kontak .form-label {
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.065em;
+}
+
+#form-kontak .kolom-form:focus-within .form-label {
+  color: var(--warna-tautan);
+}
+
+#form-kontak .form-control {
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 12px;
+  background-color: rgba(var(--teks-rgb), 0.035);
+  color: var(--warna-teks);
+}
+
+#form-kontak textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+#form-kontak .form-control.is-invalid,
+#form-kontak.was-validated .form-control:invalid {
+  border-color: var(--warna-error);
+}
+
+#form-kontak .form-control:focus {
+  border-color: var(--aksen);
+  box-shadow: 0 0 0 4px rgba(var(--aksen-rgb), 0.18);
+}
+
+#form-kontak .invalid-feedback {
+  color: var(--warna-error);
+}

@@ -1,0 +1,102 @@
+/* Warna, ukuran, font, dan variabel Bootstrap.
+   Dipakai di semua halaman. Dimuat setelah Bootstrap. */
+
+:root {
+  --font-judul: "Fraunces", Georgia, serif;
+  --font-isi: "Instrument Sans", Arial, sans-serif;
+
+  --ukuran-nama: clamp(2.5rem, 6vw, 5rem);
+  --ukuran-peran: clamp(1.05rem, 1.6vw, 1.35rem);
+  --ukuran-bagian: clamp(2rem, 4.5vw, 3.5rem);
+  --ukuran-skill: clamp(1.45rem, 2.7vw, 2.25rem);
+  --ukuran-tahun: clamp(1.4rem, 3vw, 2.3rem);
+
+  --tinggi-nav: 4rem;
+  --jarak-hero: clamp(1.25rem, 3vw, 3rem);
+  --jarak-bagian: clamp(3rem, 7vw, 6.5rem);
+  --jarak-timeline: clamp(1.5rem, 4vw, 2.5rem);
+  --jarak-titik: 0.5rem;
+  --diameter-titik: 0.625rem;
+  --tinggi-progres: 4px;
+
+  --durasi-hover: 180ms;
+  --durasi-galeri: 400ms;
+  --durasi-judul: 700ms;
+  --durasi-reveal: 520ms;
+  --durasi-panel: 350ms;
+  --gerak-masuk: cubic-bezier(0.2, 0.7, 0.25, 1);
+}
+
+html[data-bs-theme="dark"] {
+  color-scheme: dark;
+  --latar-awal: #15161B;
+  --latar-akhir: #211A18;
+  --warna-panel: #211F23;
+  --latar-form: rgb(255 255 255 / 4%);
+  --warna-teks: #EFE9DD;
+  --teks-rgb: 239, 233, 221;
+  --latar-rgb: 21, 22, 27;
+  --aksen: #E2622F;
+  --aksen-rgb: 226, 98, 47;
+  --teks-di-aksen: #15161B;
+  --warna-tautan: #E2622F;
+  --tautan-rgb: 226, 98, 47;
+  --latar-badge: #35312F;
+  --teks-badge: #EFE9DD;
+  --latar-sukses: #20352A;
+  --teks-sukses: #D5EBDD;
+  --garis-sukses: #577461;
+  --warna-error: #FFA596;
+  --warna-valid: #A6CFB4;
+}
+
+html[data-bs-theme="light"] {
+  color-scheme: light;
+  --latar-awal: #F7F2E9;
+  --latar-akhir: #EAD8C3;
+  --warna-panel: #F7F2E9;
+  --latar-form: rgb(255 255 255 / 30%);
+  --warna-teks: #1B1D26;
+  --teks-rgb: 27, 29, 38;
+  --latar-rgb: 247, 242, 233;
+  --aksen: #B5421A;
+  --aksen-rgb: 181, 66, 26;
+  --teks-di-aksen: #FFF;
+  --warna-tautan: #993913;
+  --tautan-rgb: 153, 57, 19;
+  --latar-badge: #E3D5C7;
+  --teks-badge: #34291F;
+  --latar-sukses: #E4EFE6;
+  --teks-sukses: #23452E;
+  --garis-sukses: #789581;
+  --warna-error: #932E20;
+  --warna-valid: #315D40;
+}
+
+html[data-bs-theme] {
+  --bs-body-font-family: var(--font-isi);
+  --bs-body-color: var(--warna-teks);
+  --bs-body-color-rgb: var(--teks-rgb);
+  --bs-emphasis-color: var(--warna-teks);
+  --bs-emphasis-color-rgb: var(--teks-rgb);
+  --bs-body-bg: var(--latar-awal);
+  --bs-body-bg-rgb: var(--latar-rgb);
+  --bs-secondary-color: rgba(var(--teks-rgb), 0.68);
+  --bs-secondary-color-rgb: var(--teks-rgb);
+  --bs-border-color: rgba(var(--teks-rgb), 0.15);
+  --bs-primary: var(--aksen);
+  --bs-primary-rgb: var(--aksen-rgb);
+  --bs-link-color: var(--warna-tautan);
+  --bs-link-color-rgb: var(--tautan-rgb);
+  --bs-link-hover-color: var(--warna-teks);
+  --bs-link-hover-color-rgb: var(--teks-rgb);
+  --bs-form-invalid-color: var(--warna-error);
+  --bs-form-invalid-border-color: var(--warna-error);
+  --bs-form-valid-color: var(--warna-valid);
+  --bs-form-valid-border-color: var(--warna-valid);
+  --bs-border-radius: 0.2rem;
+
+  background-color: var(--latar-awal);
+  scroll-padding-top: calc(var(--tinggi-nav) + 1rem);
+  overflow-x: clip;
+}

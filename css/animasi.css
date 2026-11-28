@@ -1,0 +1,272 @@
+/* Gerakan, masker, dan aturan pengurangan gerakan.
+   Dipakai di semua halaman. Dimuat setelah footer.css. */
+
+html.js .masker-judul,
+html.js .masker-bagian {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.08em 0.15em;
+  margin-block: -0.08em -0.15em;
+}
+
+html.js .baris-judul,
+html.js .isi-masker-bagian {
+  display: block;
+}
+
+html.js .hero h1.judul-berbaris::after {
+  content: none;
+}
+
+html.js .masker-judul:last-child .baris-judul::after {
+  content: ".";
+  content: "." / "";
+  color: var(--aksen);
+}
+
+html.arah-bawah {
+  --arah-halaman: 1;
+}
+
+html.arah-atas {
+  --arah-halaman: -1;
+}
+
+@keyframes garis-hero {
+  from { scale: 1 0; }
+  to { scale: 1 1; }
+}
+
+@keyframes kata-hero {
+  from { translate: 0 115%; }
+  to { translate: 0 0; }
+}
+
+@keyframes isi-hero {
+  from {
+    opacity: 0;
+    translate: 0 0.55rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes foto-masuk {
+  from {
+    opacity: 0;
+    scale: 1.04;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes kedip-ketik {
+  0%, 45% { opacity: 1; }
+  55%, 100% { opacity: 0; }
+}
+
+@keyframes masuk-paragraf {
+  from {
+    opacity: 0;
+    translate: 0 calc(var(--arah-masuk, var(--arah-halaman, 1)) * 0.8rem);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes masuk-baris {
+  from {
+    opacity: 0;
+    translate: -0.65rem calc(var(--arah-masuk, var(--arah-halaman, 1)) * 0.25rem);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes masuk-gambar {
+  from {
+    opacity: 0.25;
+    scale: 0.96;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes masuk-judul-bagian {
+  from {
+    translate: 0 calc(var(--arah-masuk, var(--arah-halaman, 1)) * 110%);
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes gambar-garis {
+  from { scale: 0 1; }
+  to { scale: 1 1; }
+}
+
+@keyframes masuk-filter {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes tutup-halaman {
+  from { translate: -100% 0; }
+  to { translate: 0 0; }
+}
+
+@keyframes buka-halaman {
+  from { translate: 0 0; }
+  to { translate: 100% 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.js.reveal-aktif {
+    --waktu-masuk: var(--durasi-reveal) var(--gerak-masuk);
+  }
+
+  html.js.reveal-aktif a[data-reveal] {
+    display: inline-block;
+    max-width: 100%;
+  }
+
+  html.js.reveal-aktif [data-reveal="naik"].is-visible:not(:focus-within):not(.filter-masuk) {
+    animation: masuk-paragraf var(--waktu-masuk) var(--delay, 0ms) backwards;
+  }
+
+  html.js.reveal-aktif [data-reveal="geser"].is-visible:not(:focus-within):not(.filter-masuk) {
+    animation: masuk-baris var(--waktu-masuk) var(--delay, 0ms) backwards;
+  }
+
+  html.js.reveal-aktif img[data-reveal="skala"].is-visible,
+  html.js.reveal-aktif figure[data-reveal="skala"].is-visible:not(:focus-within) > img {
+    animation: masuk-gambar var(--waktu-masuk) var(--delay, 0ms) backwards;
+  }
+
+  html.js.reveal-aktif .is-visible > .masker-bagian > .isi-masker-bagian {
+    animation: masuk-judul-bagian var(--waktu-masuk) var(--delay, 0ms) backwards;
+  }
+
+  html.js.reveal-aktif :is(h1, h2, h3)[data-reveal="garis"]::after {
+    content: "";
+    display: block;
+    width: min(100%, 6rem);
+    height: 1px;
+    margin-top: 1rem;
+    background-color: var(--aksen);
+    transform-origin: left;
+  }
+
+  html.js.reveal-aktif .is-visible[data-reveal="garis"]::after,
+  html.js.reveal-aktif hr.is-visible[data-reveal="garis"] {
+    transform-origin: left;
+    animation: gambar-garis var(--waktu-masuk) var(--delay, 0ms) backwards;
+  }
+
+  /* Setelah filter berubah, aturan ini juga menjangkau artikel di dalam indeks proyek. */
+  html.js #daftar-proyek article.filter-masuk {
+    animation: masuk-filter 420ms var(--gerak-masuk) var(--jeda-filter, 0ms) backwards;
+  }
+
+  html.js.reveal-aktif [data-reveal]:focus-within {
+    opacity: 1;
+  }
+
+  html.js .timeline-siap::before {
+    content: "";
+    position: absolute;
+    top: var(--awal-garis, 0);
+    left: var(--jarak-titik);
+    width: 1px;
+    height: var(--panjang-garis, 0px);
+    background-color: var(--aksen);
+    scale: 1 var(--progres, 0);
+    transform-origin: top;
+    pointer-events: none;
+  }
+
+  html.js .timeline-siap > li::before {
+    border: 1px solid var(--aksen);
+    background-color: var(--latar-awal);
+  }
+
+  html.js .timeline-siap > li::after {
+    content: "";
+    position: absolute;
+    top: 0.55em;
+    left: -1px;
+    width: var(--diameter-titik);
+    height: var(--diameter-titik);
+    translate: -50% 0;
+    scale: 0;
+    border-radius: 50%;
+    background-color: var(--aksen);
+    transition: scale 240ms var(--gerak-masuk);
+  }
+
+  html.js .timeline-siap > li.is-aktif::after {
+    scale: 1;
+  }
+
+  html.js .timeline-siap > li > strong,
+  html.js .timeline-siap > li > span {
+    transition:
+      opacity var(--durasi-reveal) var(--gerak-masuk),
+      translate var(--durasi-reveal) var(--gerak-masuk);
+  }
+
+  html.js .timeline-siap > li:not(.is-aktif) > strong {
+    opacity: 0;
+    translate: -0.5rem 0;
+  }
+
+  html.js .timeline-siap > li:not(.is-aktif) > span {
+    opacity: 0;
+    translate: 0 0.4rem;
+  }
+
+  html.js .timeline-siap > li.is-aktif > span {
+    transition-delay: 80ms;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .teks-proyek,
+  .panah-detail,
+  .thumbnail-proyek,
+  .tautan-kontak::after,
+  .nilai-kontak,
+  .panah-kontak {
+    transition: transform var(--durasi-hover) var(--gerak-masuk);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

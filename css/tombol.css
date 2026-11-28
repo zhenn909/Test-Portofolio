@@ -1,0 +1,110 @@
+/* Tampilan tombol Bootstrap, tombol kontak, sapuan warna, dan label berguling.
+   Dipakai di semua halaman. Dimuat setelah navbar.css. */
+
+.btn-primary,
+.btn-outline-primary {
+  --bs-btn-hover-color: var(--teks-di-aksen);
+  --bs-btn-hover-bg: var(--aksen);
+  --bs-btn-hover-border-color: var(--aksen);
+  --bs-btn-active-color: var(--teks-di-aksen);
+  --bs-btn-active-bg: var(--aksen);
+  --bs-btn-active-border-color: var(--aksen);
+  --bs-btn-focus-shadow-rgb: var(--aksen-rgb);
+}
+
+.btn-primary {
+  --bs-btn-color: var(--teks-di-aksen);
+  --bs-btn-bg: var(--aksen);
+  --bs-btn-border-color: var(--aksen);
+  --bs-btn-disabled-color: var(--teks-di-aksen);
+  --bs-btn-disabled-bg: var(--aksen);
+  --bs-btn-disabled-border-color: var(--aksen);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--warna-tautan);
+  --bs-btn-border-color: var(--aksen);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--warna-teks);
+  --bs-btn-border-color: var(--bs-secondary-color);
+  --bs-btn-hover-bg: var(--warna-teks);
+  --bs-btn-hover-border-color: var(--warna-teks);
+  --bs-btn-hover-color: var(--latar-awal);
+  --bs-btn-active-bg: var(--warna-teks);
+  --bs-btn-active-color: var(--latar-awal);
+}
+
+#salin-email,
+#form-kontak button[type="submit"] {
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--aksen);
+  border-radius: 999px;
+}
+
+/* Kedua label berbagi satu tempat agar ukuran tombol tetap stabil. */
+.guling {
+  display: inline-grid;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.guling__asli,
+.guling__salinan {
+  grid-area: 1 / 1;
+}
+
+.guling__salinan {
+  translate: 0 100%;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .guling__asli,
+  .guling__salinan {
+    transition: translate 400ms var(--gerak-masuk);
+  }
+
+  /* Label bisa berada langsung di tombol atau di dalam span bersama ikon. */
+  :is(a, button):is(:hover, :focus-visible) > .guling > .guling__asli,
+  :is(a, button):is(:hover, :focus-visible) > span > .guling > .guling__asli {
+    translate: 0 -100%;
+  }
+
+  :is(a, button):is(:hover, :focus-visible) > .guling > .guling__salinan,
+  :is(a, button):is(:hover, :focus-visible) > span > .guling > .guling__salinan {
+    translate: 0 0;
+  }
+
+  /* Lapisan warna bergerak di belakang isi tombol, dari tepi kiri. */
+  .sapuan {
+    isolation: isolate;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sapuan::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--aksen);
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale 260ms ease;
+  }
+
+  .btn.sapuan:is(:hover, :focus-visible) {
+    background-color: transparent;
+    color: var(--teks-di-aksen);
+  }
+
+  .sapuan:is(:hover, :focus-visible)::before {
+    scale: 1;
+  }
+
+  .sapuan:active {
+    scale: 0.97;
+  }
+}

@@ -1,0 +1,100 @@
+/* Navigasi, tombol tema, dan garis bawah untuk menu aktif.
+   Dipakai di semua halaman. Dimuat setelah dasar.css. */
+
+.navbar {
+  min-height: var(--tinggi-nav);
+  --bs-navbar-color: var(--bs-secondary-color);
+  --bs-navbar-active-color: var(--warna-teks);
+  --bs-navbar-hover-color: var(--warna-tautan);
+  --bs-navbar-brand-color: var(--warna-teks);
+  --bs-navbar-brand-hover-color: var(--warna-tautan);
+}
+
+body > .navbar {
+  border-bottom: 1px solid transparent;
+}
+
+body:has(#progress-scroll[style*="--progres:"]:not([style*="--progres: 0;"])) > .navbar {
+  border-bottom-color: var(--bs-border-color);
+}
+
+.navbar-brand {
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-weight: 700;
+}
+
+.navbar .nav-link,
+[data-tema-toggle] {
+  font-size: 0.9rem;
+  letter-spacing: 0.045em;
+}
+
+.navbar .nav-link {
+  text-decoration: none;
+}
+
+.navbar .nav-link.active {
+  text-decoration: underline;
+  text-decoration-color: var(--aksen);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.4em;
+}
+
+[data-tema-toggle] {
+  padding: 0.55rem 0.25rem;
+  border: 0;
+  background: transparent;
+  color: var(--warna-teks);
+  box-shadow: none;
+}
+
+[data-tema-toggle]:is(:hover, :focus-visible) {
+  color: var(--warna-tautan);
+  text-decoration: underline;
+}
+
+.navbar-toggler {
+  min-height: 2.75rem;
+}
+
+@media (max-width: 767.98px) {
+  .navbar-collapse {
+    background-color: var(--latar-awal);
+  }
+
+  .navbar-nav {
+    padding-block: 0.75rem 0.25rem;
+  }
+
+  .navbar .nav-link {
+    padding-block: 0.7rem;
+  }
+
+  [data-tema-toggle] {
+    padding-inline: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .navbar > .container {
+    position: relative;
+  }
+
+  .navbar .navbar-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: clamp(0.5rem, 1.5vw, 1.75rem);
+  }
+
+  .navbar-collapse {
+    justify-content: flex-end;
+  }
+}
+
+/* Garis bawah tetap terlihat pada kedua label saat teks menu aktif berguling. */
+.navbar .nav-link.active .guling > span {
+  text-decoration: underline;
+  text-decoration-color: var(--aksen);
+  text-underline-offset: 0.2em;
+}

@@ -1,38 +1,41 @@
+// Mengatur animasi hero, scroll, filter, kursor, tombol, pratinjau, dan perpindahan halaman.
 "use strict";
 
 (() => {
+  const akar = document.documentElement;
   const gerakanMinimal = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const mouseHalus = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const pointerHalus = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const kunciTransisi = "portofolio-tujuan-transisi";
 
-  // Membagi nama menjadi dua baris untuk animasi pertama di Beranda.
-  function siapkanJudulHero() {
-    const judul = document.querySelector(".hero h1");
+  // Bagi nama menjadi dua baris agar setiap kata bisa muncul secara berurutan.
+  function siapkanHero() {
+    const hero = document.querySelector("header.hero");
+    const judul = hero?.querySelector("h1");
     if (!judul || gerakanMinimal.matches) return;
 
     const kata = judul.textContent.trim().split(/\s+/);
-    if (kata.length !== 2) return;
-
     const isi = document.createDocumentFragment();
 
-    kata.forEach((teks, urutan) => {
+    kata.forEach((teks, indeks) => {
       const masker = document.createElement("span");
       masker.className = "masker-judul";
 
       const baris = document.createElement("span");
       baris.className = "baris-judul";
-      baris.style.setProperty("--jeda-judul", `${urutan * 120}ms`);
+      baris.style.setProperty("--urutan-kata", indeks);
       baris.textContent = teks;
 
+      if (indeks > 0) isi.append(" ");
       masker.append(baris);
-      if (urutan > 0) isi.append(" ");
       isi.append(masker);
     });
 
     judul.replaceChildren(isi);
     judul.classList.add("judul-berbaris");
+    hero.classList.add("hero-siap");
   }
 
-  // Menampilkan satu kalimat penuh saat pengguna memilih gerakan minimal.
+  // Ketik dan hapus kalimat di hero. Jeda saat tab disembunyikan.
   function siapkanEfekKetik() {
     const tempat = document.getElementById("teks-ketik");
     if (!tempat) return;
@@ -40,251 +43,242 @@
     const kalimat = [
       "mahasiswa Sistem Informasi.",
       "yang sedang belajar membuat web.",
-      "yang pernah membuat aplikasi stok."
+      "yang pernah membuat aplikasi mobile dengan Flutter."
     ];
 
     const visual = document.createElement("span");
     visual.setAttribute("aria-hidden", "true");
 
     const bacaan = document.createElement("span");
-    bacaan.className = "khusus-pembaca-layar";
+    bacaan.className = "visually-hidden";
     bacaan.textContent = kalimat[0];
-
     tempat.replaceChildren(visual, bacaan);
 
     let indeks = 0;
     let panjang = 0;
     let menghapus = false;
-    let timer;
+    let timer = 0;
+    let sisaJeda = 560;
+    let batasWaktu = 0;
 
+    // Simpan waktu langkah berikutnya agar pengetikan bisa dilanjutkan.
+    function jadwalkan(jeda) {
+      sisaJeda = jeda;
+      if (document.hidden || gerakanMinimal.matches) return;
+
+      batasWaktu = performance.now() + jeda;
+      timer = window.setTimeout(langkah, jeda);
+    }
+
+    // Tambah atau hapus satu huruf, lalu tentukan jeda berikutnya.
     function langkah() {
+      timer = 0;
       const teks = kalimat[indeks];
       panjang += menghapus ? -1 : 1;
       visual.textContent = teks.slice(0, panjang);
 
-      let jeda = menghapus ? 32 : 45 + Math.floor(Math.random() * 46);
-
       if (panjang === teks.length) {
         menghapus = true;
-        jeda = 1700;
+        jadwalkan(1600);
       } else if (panjang === 0) {
         menghapus = false;
         indeks = (indeks + 1) % kalimat.length;
-        jeda = 300;
+        jadwalkan(300);
+      } else {
+        jadwalkan(menghapus ? 32 : 45 + Math.floor(Math.random() * 46));
       }
-
-      timer = window.setTimeout(langkah, jeda);
     }
 
-    function aturPemutaran() {
+    // Tampilkan kalimat lengkap saat pengguna mengurangi gerakan.
+    function aturGerakan() {
       window.clearTimeout(timer);
-      tempat.classList.remove("sedang-mengetik");
-
-      if (gerakanMinimal.matches) {
-        visual.textContent = kalimat[0];
-        return;
-      }
-
-      if (document.hidden) return;
-
+      timer = 0;
       indeks = 0;
       panjang = 0;
       menghapus = false;
-      tempat.classList.add("sedang-mengetik");
-      langkah();
+
+      tempat.classList.toggle("sedang-mengetik", !gerakanMinimal.matches);
+      visual.textContent = gerakanMinimal.matches ? kalimat[0] : "";
+      if (!gerakanMinimal.matches) jadwalkan(560);
     }
 
-    gerakanMinimal.addEventListener("change", aturPemutaran);
-    document.addEventListener("visibilitychange", aturPemutaran);
-    aturPemutaran();
+    document.addEventListener("visibilitychange", () => {
+      if (gerakanMinimal.matches) return;
+
+      if (document.hidden && timer) {
+        sisaJeda = Math.max(0, batasWaktu - performance.now());
+        window.clearTimeout(timer);
+        timer = 0;
+      } else if (!document.hidden && !timer) {
+        jadwalkan(sisaJeda);
+      }
+    });
+
+    gerakanMinimal.addEventListener("change", aturGerakan);
+    aturGerakan();
   }
 
-  // Memilih elemen isi dan menentukan gerakan sesuai jenisnya.
-  function kumpulkanElemenReveal() {
-    const daftar = [];
+  // Tentukan jenis animasi dan jeda untuk isi halaman serta footer.
+  function kumpulkanReveal() {
+    const hasil = [];
     const urutanInduk = new Map();
 
-    const kandidat = [
-      "[data-reveal]",
-      "h1", "h2", "h3", "p", "li", "a[href]",
-      "figure", "img", "hr",
-      "#form-kontak > div"
+    const sasaran = [
+      "[data-reveal]", "h1", "h2", "h3", "p", "li", "a[href]", "button",
+      "figure", "img", "hr", ".baris-proyek", ".baris-kontak",
+      ".panel-form", ".kolom-form"
     ].join(", ");
 
-    const dikecualikan = [
-      "header",
-      "dialog",
-      '[role="dialog"]',
-      "#teks-ketik",
-      '[aria-labelledby="judul-perjalanan"] ol',
-      '[id^="error-"]',
-      '[role="status"]',
-      "[aria-live]",
-      "[hidden]",
-      "script"
+    const pengecualian = [
+      ".hero", ".navbar", ".modal", ".toast", ".carousel", ".collapse",
+      "#penanda-bagian", "#progress-scroll", "#kembali-ke-atas",
+      ".kursor-kecil", ".timeline", "#teks-ketik", ".visually-hidden",
+      ".invalid-feedback", ".alert", "[aria-live]", "[role='status']", "[hidden]"
     ].join(", ");
 
     for (const area of document.querySelectorAll("main, body > footer")) {
-      for (const elemen of area.querySelectorAll(kandidat)) {
-        if (elemen.closest(dikecualikan)) continue;
-        if (elemen.matches("p") && !elemen.textContent.trim()) continue;
+      for (const item of area.querySelectorAll(sasaran)) {
+        // Animasikan baris proyek sebagai satu kesatuan agar tombol tetap mencakup baris.
+        if (item.closest(".baris-proyek") && !item.matches(".baris-proyek")) continue;
+        if (item.closest(pengecualian)) continue;
+        if (item.matches("figure img") && !item.hasAttribute("data-reveal")) continue;
 
-        // Foto dan keterangannya bergerak bersama dalam satu figure.
-        if (elemen.matches("figure img") && !elemen.hasAttribute("data-reveal")) {
-          continue;
-        }
-
-        if (!elemen.hasAttribute("data-reveal")) {
+        if (!item.hasAttribute("data-reveal")) {
           let jenis = "naik";
 
-          if (elemen.matches("h1, h2, h3")) {
+          if (item.matches("h1, h2, h3")) {
             jenis = "masker";
-          } else if (elemen.matches("li, a")) {
-            jenis = "geser";
-          } else if (elemen.matches("figure, img")) {
+          } else if (item.matches("figure, img")) {
             jenis = "skala";
-          } else if (elemen.matches("hr")) {
+          } else if (item.matches("li, .baris-proyek, .baris-kontak")) {
+            jenis = "geser";
+          } else if (item.matches("hr")) {
             jenis = "garis";
           }
 
-          elemen.dataset.reveal = jenis;
+          item.dataset.reveal = jenis;
         }
 
-        const induk = elemen.parentElement;
+        const induk = item.parentElement;
         const urutan = urutanInduk.get(induk) || 0;
         urutanInduk.set(induk, urutan + 1);
 
-        const jedaHTML = Number(elemen.dataset.delay);
-        const punyaJeda = elemen.hasAttribute("data-delay") && Number.isFinite(jedaHTML);
-        const jeda = punyaJeda ? jedaHTML : urutan * 70;
-        elemen.style.setProperty("--jeda-reveal", `${Math.min(400, Math.max(0, jeda))}ms`);
+        const jeda = item.hasAttribute("data-delay")
+          ? Number(item.dataset.delay)
+          : urutan * 70;
+        const jedaAman = Number.isFinite(jeda) ? Math.max(0, Math.min(400, jeda)) : 0;
+        item.style.setProperty("--delay", `${jedaAman}ms`);
 
-        // Isi judul bergerak di dalam masker. Nomor dan ID judul tetap tersedia.
-        if (elemen.matches("h1, h2, h3")) {
+        if (item.matches("h1, h2, h3")) {
           const masker = document.createElement("span");
-          masker.className = "masker-bagian";
-
           const baris = document.createElement("span");
+          masker.className = "masker-bagian";
           baris.className = "isi-masker-bagian";
 
-          while (elemen.firstChild) baris.append(elemen.firstChild);
+          while (item.firstChild) baris.append(item.firstChild);
           masker.append(baris);
-          elemen.append(masker);
+          item.append(masker);
         }
 
-        daftar.push(elemen);
+        hasil.push(item);
       }
     }
 
-    return daftar;
+    return hasil;
   }
 
-  // Mengulang animasi ketika elemen masuk kembali dari atas atau bawah.
+  // Mulai animasi ketika elemen masuk layar. Siapkan ulang setelah keluar sepenuhnya.
   function siapkanReveal() {
     if (!("IntersectionObserver" in window)) return;
 
-    const elemen = kumpulkanElemenReveal();
-    if (!elemen.length) return;
+    const daftar = kumpulkanReveal();
+    if (!daftar.length) return;
 
-    const akar = document.documentElement;
-    let posisiTerakhir = Math.max(0, window.scrollY);
-    let arah = "dari-bawah";
+    let posisiLama = Math.max(0, window.scrollY);
+    let arah = "bawah";
+    let frame = 0;
 
-    // Listener ini hanya membandingkan posisi scroll, tanpa mengukur elemen.
+    // Bandingkan posisi scroll sekarang dengan posisi sebelumnya.
     function bacaArah() {
-      const sekarang = Math.max(0, window.scrollY);
-      if (sekarang === posisiTerakhir) return;
+      const posisi = Math.max(0, window.scrollY);
+      if (posisi !== posisiLama) arah = posisi < posisiLama ? "atas" : "bawah";
+      posisiLama = posisi;
 
-      arah = sekarang < posisiTerakhir ? "dari-atas" : "dari-bawah";
-      posisiTerakhir = sekarang;
+      akar.classList.toggle("arah-atas", arah === "atas");
+      akar.classList.toggle("arah-bawah", arah === "bawah");
     }
 
-    function pasangArah(item) {
-      item.classList.toggle("dari-atas", arah === "dari-atas");
-      item.classList.toggle("dari-bawah", arah === "dari-bawah");
+    // Baca arah scroll paling banyak sekali per frame.
+    function jadwalkanArah() {
+      if (frame) return;
+
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        bacaArah();
+      });
     }
 
+    // Simpan arah saat elemen mulai muncul.
     function tampilkan(item) {
       if (item.classList.contains("is-visible")) return;
-      bacaArah();
-      pasangArah(item);
+
+      item.style.setProperty("--arah-masuk", arah === "atas" ? "-1" : "1");
       item.classList.add("is-visible");
     }
 
-    // Elemen yang lebih tinggi dari layar tetap dapat mulai dianimasikan.
     const pengamatMasuk = new IntersectionObserver((entri) => {
       if (gerakanMinimal.matches) return;
+      bacaArah();
 
       for (const data of entri) {
-        if (!data.isIntersecting) continue;
-
-        const tinggiArea = data.rootBounds?.height || window.innerHeight;
-        const tinggiTarget = data.boundingClientRect.height;
-        const cukupTerlihat = data.intersectionRatio >= 0.15;
-        const terlaluTinggi = tinggiTarget * 0.15 > tinggiArea;
-
-        if (cukupTerlihat || terlaluTinggi) tampilkan(data.target);
+        if (data.isIntersecting && data.intersectionRatio >= 0.15) {
+          tampilkan(data.target);
+        }
       }
     }, {
-      threshold: [0, 0.15],
-      rootMargin: "0px 0px -10% 0px"
+      threshold: [0.15],
+      rootMargin: "0px 0px -8% 0px"
     });
 
-    // Area reset memakai seluruh layar, termasuk 10% terbawah.
     const pengamatKeluar = new IntersectionObserver((entri) => {
       if (gerakanMinimal.matches) return;
 
       for (const data of entri) {
-        if (data.isIntersecting) continue;
-
-        const item = data.target;
-        if (item.contains(document.activeElement)) continue;
-
-        item.classList.remove("is-visible");
-        // Siapkan sisi masuk berikutnya berdasarkan letak elemen di luar layar.
-        const diAtas = data.boundingClientRect.bottom <= 0;
-        item.classList.toggle("dari-atas", diAtas);
-        item.classList.toggle("dari-bawah", !diAtas);
+        if (!data.isIntersecting) data.target.classList.remove("is-visible");
       }
     }, { threshold: 0 });
 
+    // Pasang atau lepas pengamat ketika preferensi gerakan berubah.
     function aturReveal() {
       pengamatMasuk.disconnect();
       pengamatKeluar.disconnect();
-      window.removeEventListener("scroll", bacaArah);
+      window.removeEventListener("scroll", jadwalkanArah);
+      window.cancelAnimationFrame(frame);
+      frame = 0;
       akar.classList.remove("reveal-aktif");
 
       if (gerakanMinimal.matches) {
-        for (const item of elemen) item.classList.add("is-visible");
+        for (const item of daftar) item.classList.add("is-visible");
         return;
       }
 
-      posisiTerakhir = Math.max(0, window.scrollY);
-      arah = "dari-bawah";
+      posisiLama = Math.max(0, window.scrollY);
+      bacaArah();
 
-      // Baca posisi sebelum memasang keadaan awal animasi.
-      const posisi = elemen.map((item) => item.getBoundingClientRect());
-      const tinggiLayar = document.documentElement.clientHeight;
-
-      elemen.forEach((item, indeks) => {
+      for (const item of daftar) {
         item.classList.remove("is-visible");
-        pasangArah(item);
         pengamatMasuk.observe(item);
         pengamatKeluar.observe(item);
+      }
 
-        const kotak = posisi[indeks];
-        if (kotak.bottom > 0 && kotak.top < tinggiLayar) {
-          item.classList.add("is-visible");
-        }
-      });
-
-      // CSS baru mengaktifkan keadaan tersembunyi setelah kedua pengamat siap.
       akar.classList.add("reveal-aktif");
-      window.addEventListener("scroll", bacaArah, { passive: true });
+      window.addEventListener("scroll", jadwalkanArah, { passive: true });
     }
 
-    // Tautan atau kolom yang mendapat fokus keyboard langsung dapat dilihat.
     document.addEventListener("focusin", (event) => {
+      if (!akar.classList.contains("reveal-aktif")) return;
+      if (!(event.target instanceof Element)) return;
+
       let item = event.target.closest("[data-reveal]");
       while (item) {
         tampilkan(item);
@@ -296,137 +290,210 @@
     aturReveal();
   }
 
-  // Menggambar dan memendekkan garis sesuai posisi scroll pada timeline.
+  // Gambar garis timeline sesuai posisi scroll.
   function siapkanTimeline() {
-    const daftar = document.querySelector('[aria-labelledby="judul-perjalanan"] ol');
+    const daftar = document.querySelector("#perjalanan .timeline");
     if (!daftar || !("IntersectionObserver" in window)) return;
 
     const item = Array.from(daftar.children);
     if (!item.length) return;
 
     let frame = 0;
-    let aktif = false;
-    let posisiTitik = [];
-    let pusatTitik = 0;
-    let panjangGaris = 0;
+    let pusat = 0;
+    let panjang = 0;
+    let posisi = [];
 
-    // Jarak antartitik diukur ulang saat tata letak berubah.
+    // Perbarui panjang garis dan titik yang sudah tercapai.
+    function gambar() {
+      frame = 0;
+      if (gerakanMinimal.matches || !posisi.length) return;
+
+      const atas = daftar.getBoundingClientRect().top;
+      const batas = window.innerHeight * 0.78 - atas - pusat;
+      const bagian = panjang > 0 ? batas / panjang : Number(batas >= 0);
+
+      daftar.style.setProperty("--progres", Math.max(0, Math.min(1, bagian)));
+
+      item.forEach((baris, indeks) => {
+        baris.classList.toggle("is-aktif", batas >= posisi[indeks]);
+      });
+    }
+
+    // Gabungkan permintaan gambar yang datang dalam frame yang sama.
+    function jadwalkan() {
+      if (!frame) frame = window.requestAnimationFrame(gambar);
+    }
+
+    // Ukur lagi titik timeline saat ukuran halaman atau font berubah.
     function ukur() {
       if (gerakanMinimal.matches) return;
 
       const atas = daftar.getBoundingClientRect().top;
-      posisiTitik = item.map((baris) => baris.getBoundingClientRect().top - atas);
+      posisi = item.map((baris) => baris.getBoundingClientRect().top - atas);
+      const titik = getComputedStyle(item[0], "::before");
 
-      const ukuranHuruf = parseFloat(getComputedStyle(item[0]).fontSize);
-      const diameter = parseFloat(getComputedStyle(item[0], "::before").width) || 0;
+      pusat = (parseFloat(titik.top) || 0) + (parseFloat(titik.width) || 0) / 2;
+      panjang = posisi[posisi.length - 1];
 
-      pusatTitik = ukuranHuruf * 0.55 + diameter / 2;
-      panjangGaris = posisiTitik[posisiTitik.length - 1];
-
-      daftar.style.setProperty("--awal-garis", `${pusatTitik}px`);
-      daftar.style.setProperty("--panjang-garis", `${panjangGaris}px`);
-      gambar();
-    }
-
-    function gambar() {
-      frame = 0;
-      if (gerakanMinimal.matches) return;
-
-      const atas = daftar.getBoundingClientRect().top;
-      const batas = window.innerHeight * 0.78 - atas - pusatTitik;
-      const bagian = panjangGaris > 0 ? batas / panjangGaris : Number(batas >= 0);
-      const progres = Math.min(1, Math.max(0, bagian));
-
-      daftar.style.setProperty("--progres-timeline", progres);
-
-      item.forEach((baris, indeks) => {
-        baris.classList.toggle("titik-tercapai", batas >= posisiTitik[indeks]);
-      });
-    }
-
-    function jadwalkan() {
-      if (aktif && !frame) frame = window.requestAnimationFrame(gambar);
-    }
-
-    function hentikan() {
-      aktif = false;
-      window.removeEventListener("scroll", jadwalkan);
-      window.cancelAnimationFrame(frame);
-      frame = 0;
+      daftar.style.setProperty("--awal-garis", `${pusat}px`);
+      daftar.style.setProperty("--panjang-garis", `${panjang}px`);
+      jadwalkan();
     }
 
     const pengamat = new IntersectionObserver(([data]) => {
-      if (gerakanMinimal.matches) return;
+      if (gerakanMinimal.matches || !data) return;
 
       if (data.isIntersecting) {
-        aktif = true;
         window.addEventListener("scroll", jadwalkan, { passive: true });
-        jadwalkan();
       } else {
-        hentikan();
-        gambar();
+        window.removeEventListener("scroll", jadwalkan);
       }
-    }, { rootMargin: "80px 0px" });
 
+      jadwalkan();
+    }, { rootMargin: "100px 0px" });
+
+    // Aktifkan timeline bergerak jika pengguna mengizinkan animasi.
     function aturTimeline() {
       pengamat.disconnect();
-      hentikan();
+      window.removeEventListener("scroll", jadwalkan);
+      window.cancelAnimationFrame(frame);
+      frame = 0;
       daftar.classList.toggle("timeline-siap", !gerakanMinimal.matches);
 
-      if (gerakanMinimal.matches) return;
-
-      ukur();
-      pengamat.observe(daftar);
+      if (!gerakanMinimal.matches) {
+        ukur();
+        pengamat.observe(daftar);
+      }
     }
 
     if ("ResizeObserver" in window) {
-      const pengamatUkuran = new ResizeObserver(ukur);
-      pengamatUkuran.observe(daftar);
+      const ukuran = new ResizeObserver(ukur);
+      ukuran.observe(daftar);
     }
 
     window.addEventListener("resize", ukur);
     window.addEventListener("pageshow", ukur);
     if (document.fonts) document.fonts.ready.then(ukur);
-
     gerakanMinimal.addEventListener("change", aturTimeline);
     aturTimeline();
   }
 
-  // Membuat penanda mouse hanya setelah gerakan mouse pertama.
-  function siapkanKursor() {
-    let kursor;
-    let frame = 0;
-    let terlihat = false;
-    let x = 0;
-    let y = 0;
-    let tujuanX = 0;
-    let tujuanY = 0;
+  // Animasikan proyek yang kembali terlihat setelah pengguna mengganti filter.
+  function siapkanAnimasiFilter() {
+    const daftar = document.getElementById("daftar-proyek");
+    const filter = document.querySelector(".filter-proyek");
+    if (!daftar || !filter) return;
 
-    function sembunyikan() {
-      terlihat = false;
-      window.cancelAnimationFrame(frame);
-      frame = 0;
-      if (kursor) kursor.classList.remove("terlihat");
+    const proyek = Array.from(daftar.querySelectorAll("article[data-kategori]"));
+    let tersembunyi = new Set();
+    let frame = 0;
+
+    // Lepas penanda agar animasi bisa dipakai lagi pada filter berikutnya.
+    function bersihkan(item) {
+      item.classList.remove("filter-masuk");
+      item.style.removeProperty("--jeda-filter");
     }
 
-    function ikuti() {
-      x += (tujuanX - x) * 0.24;
-      y += (tujuanY - y) * 0.24;
+    // Catat proyek tersembunyi sebelum main.js menjalankan filter.
+    filter.addEventListener("click", (event) => {
+      if (!(event.target instanceof Element)) return;
+      if (!event.target.closest("button[data-filter]")) return;
 
-      const dekat = Math.hypot(tujuanX - x, tujuanY - y) < 0.4;
-      if (dekat) {
-        x = tujuanX;
-        y = tujuanY;
+      window.cancelAnimationFrame(frame);
+      proyek.forEach(bersihkan);
+      tersembunyi = new Set(proyek.filter((item) => item.classList.contains("d-none")));
+    }, true);
+
+    filter.addEventListener("click", (event) => {
+      if (gerakanMinimal.matches || !(event.target instanceof Element)) return;
+      if (!event.target.closest("button[data-filter]")) return;
+
+      frame = window.requestAnimationFrame(() => {
+        const muncul = proyek.filter((item) => {
+          return tersembunyi.has(item) && !item.classList.contains("d-none");
+        });
+
+        muncul.forEach((item, indeks) => {
+          item.style.setProperty("--jeda-filter", `${indeks * 60}ms`);
+          item.classList.add("filter-masuk");
+        });
+      });
+    });
+
+    // Bersihkan kelas ketika animasi filter selesai atau dibatalkan.
+    function selesai(event) {
+      if (event.animationName === "masuk-filter") bersihkan(event.target);
+    }
+
+    daftar.addEventListener("animationend", selesai);
+    daftar.addEventListener("animationcancel", selesai);
+
+    gerakanMinimal.addEventListener("change", () => {
+      window.cancelAnimationFrame(frame);
+      proyek.forEach(bersihkan);
+    });
+  }
+
+  // Kursor, magnet, dan pratinjau memakai posisi mouse dan jadwal gambar yang sama.
+  const pelukis = [];
+  let framePenunjuk = 0;
+  let mouse = null;
+
+  // Jalankan frame berikutnya hanya selama ada efek yang masih bergerak.
+  function jadwalkanPenunjuk() {
+    if (framePenunjuk) return;
+
+    framePenunjuk = window.requestAnimationFrame(() => {
+      framePenunjuk = 0;
+      let bergerak = false;
+
+      for (const gambar of pelukis) {
+        if (gambar(mouse)) bergerak = true;
       }
 
-      kursor.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      frame = dekat ? 0 : window.requestAnimationFrame(ikuti);
+      if (bergerak) jadwalkanPenunjuk();
+    });
+  }
+
+  // Simpan posisi mouse terakhir untuk semua efek yang mengikutinya.
+  function siapkanPenunjuk() {
+    document.addEventListener("pointermove", (event) => {
+      const bolehBergerak = event.pointerType === "mouse" &&
+        pointerHalus.matches && !gerakanMinimal.matches;
+
+      if (bolehBergerak && event.target instanceof Element) {
+        mouse = { x: event.clientX, y: event.clientY, target: event.target };
+      } else {
+        mouse = null;
+      }
+
+      jadwalkanPenunjuk();
+    }, { passive: true });
+
+    // Kembalikan efek ke posisi awal saat mouse atau halaman kehilangan fokus.
+    function reset() {
+      mouse = null;
+      jadwalkanPenunjuk();
     }
 
-    function gerakkan(event) {
-      if (event.pointerType !== "mouse") {
-        sembunyikan();
-        return;
+    akar.addEventListener("pointerleave", reset);
+    window.addEventListener("blur", reset);
+    window.addEventListener("pagehide", reset);
+    document.addEventListener("show.bs.modal", reset);
+    pointerHalus.addEventListener("change", reset);
+    gerakanMinimal.addEventListener("change", reset);
+  }
+
+  // Tampilkan lingkaran kecil setelah mouse pertama kali bergerak.
+  function siapkanKursor() {
+    let kursor = null;
+    let x = 0;
+    let y = 0;
+
+    pelukis.push((pos) => {
+      if (!pos) {
+        kursor?.classList.remove("terlihat");
+        return false;
       }
 
       if (!kursor) {
@@ -436,40 +503,272 @@
         document.body.append(kursor);
       }
 
-      tujuanX = event.clientX;
-      tujuanY = event.clientY;
-
-      if (!terlihat) {
-        x = tujuanX;
-        y = tujuanY;
-        kursor.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        terlihat = true;
-        kursor.classList.add("terlihat");
+      if (!kursor.classList.contains("terlihat")) {
+        x = pos.x;
+        y = pos.y;
       }
 
-      const kontrol = event.target.closest("a[href], button:enabled");
+      x += (pos.x - x) * 0.24;
+      y += (pos.y - y) * 0.24;
+
+      kursor.style.translate = `${x}px ${y}px`;
+      kursor.classList.add("terlihat");
+
+      const kontrol = pos.target.closest("a[href], button:enabled, .galeri-unggulan figure");
       kursor.classList.toggle("di-atas-kontrol", Boolean(kontrol));
-      if (!frame) ikuti();
-    }
 
-    function aturKursor() {
-      if (mouseHalus.matches && !gerakanMinimal.matches) {
-        document.addEventListener("pointermove", gerakkan, { passive: true });
-      } else {
-        document.removeEventListener("pointermove", gerakkan);
-        sembunyikan();
-      }
-    }
-
-    document.documentElement.addEventListener("pointerleave", sembunyikan);
-    window.addEventListener("blur", sembunyikan);
-    window.addEventListener("pagehide", sembunyikan);
-    mouseHalus.addEventListener("change", aturKursor);
-    gerakanMinimal.addEventListener("change", aturKursor);
-    aturKursor();
+      return Math.hypot(pos.x - x, pos.y - y) > 0.4;
+    });
   }
 
-  // Menjalankan sapuan hanya untuk navigasi internal antardokumen HTML.
+  // Geser tombol Hubungi saya dan Kirim pesan maksimal delapan piksel ke arah mouse.
+  function siapkanMagnet() {
+    const tombolUtama = document.querySelectorAll(
+      ".hero .btn-outline-primary, #form-kontak button[type=submit]"
+    );
+
+    for (const tombol of tombolUtama) {
+      let x = 0;
+      let y = 0;
+
+      pelukis.push((pos) => {
+        let tujuanX = 0;
+        let tujuanY = 0;
+
+        if (pos && !tombol.disabled) {
+          const kotak = tombol.getBoundingClientRect();
+
+          // Kurangi pergeseran lama agar pusat tombol tidak ikut mengejar mouse.
+          const dx = pos.x - (kotak.left + kotak.width / 2 - x);
+          const dy = pos.y - (kotak.top + kotak.height / 2 - y);
+          const jarak = Math.hypot(dx, dy);
+          const faktor = Math.max(0, 1 - jarak / 80) * 8 / Math.max(1, jarak);
+
+          tujuanX = dx * faktor;
+          tujuanY = dy * faktor;
+        }
+
+        x += (tujuanX - x) * 0.25;
+        y += (tujuanY - y) * 0.25;
+
+        if (gerakanMinimal.matches || Math.hypot(tujuanX - x, tujuanY - y) < 0.1) {
+          x = tujuanX;
+          y = tujuanY;
+        }
+
+        tombol.style.translate = x || y ? `${x}px ${y}px` : "";
+        return x !== tujuanX || y !== tujuanY;
+      });
+    }
+  }
+
+  // Bungkus teks tautan dan tombol agar label bisa berguling tanpa menggandakan bacaannya.
+  function siapkanGuling() {
+    const sasaran = document.querySelectorAll(
+      ".navbar .nav-link, [data-tema-toggle], .tautan-kontak, .btn-outline-primary, button[data-filter]"
+    );
+
+    for (const tombol of sasaran) {
+      if (tombol.closest(".modal, .toast, .carousel, #penanda-bagian, #progress-scroll")) {
+        continue;
+      }
+
+      if (tombol.matches(".btn-outline-primary")) tombol.classList.add("sapuan");
+
+      const label = tombol.querySelector("[data-label-salin], .nilai-kontak") || tombol;
+
+      // Bungkus simpul teks saja agar ikon dan angka pada filter tetap tersedia.
+      function bungkus() {
+        if (label.closest('[aria-busy="true"]') || label.querySelector(".guling")) return;
+
+        const teks = Array.from(label.childNodes).find((simpul) => {
+          return simpul.nodeType === Node.TEXT_NODE && simpul.textContent.trim();
+        });
+        if (!teks) return;
+
+        const masker = document.createElement("span");
+        masker.className = "guling";
+
+        const asli = document.createElement("span");
+        asli.className = "guling__asli";
+        asli.textContent = teks.textContent.trim();
+
+        const salinan = asli.cloneNode(true);
+        salinan.className = "guling__salinan";
+        salinan.setAttribute("aria-hidden", "true");
+
+        masker.append(asli, salinan);
+
+        // Pertahankan spasi di samping angka filter atau ikon tombol.
+        const isiAwal = teks.textContent;
+        const awal = isiAwal.match(/^\s*/)[0];
+        const akhir = isiAwal.match(/\s*$/)[0];
+        teks.replaceWith(awal, masker, akhir);
+      }
+
+      bungkus();
+
+      // main.js bisa mengganti label menjadi Mode gelap, Tersalin, atau Mengirim...
+      const pengamat = new MutationObserver(bungkus);
+      pengamat.observe(label, { childList: true });
+    }
+  }
+
+  // Gunakan satu gambar mengambang untuk semua baris pada indeks proyek.
+  function siapkanPratinjau() {
+    const daftar = document.getElementById("indeks-proyek");
+    if (!daftar) return;
+
+    const desktop = window.matchMedia(
+      "(min-width: 992px) and (hover: hover) and (pointer: fine)"
+    );
+
+    const panel = document.createElement("figure");
+    panel.className = "pratinjau-proyek";
+    panel.setAttribute("aria-hidden", "true");
+
+    const gambar = document.createElement("img");
+    gambar.alt = "";
+    panel.append(gambar);
+    document.body.append(panel);
+
+    const cache = new Map();
+    let aktif = null;
+    let keyboard = false;
+    let baru = false;
+    let x = 0;
+    let y = 0;
+    let kemiringan = 0;
+
+    // Muat gambar pertama setiap proyek ketika pratinjau desktop bisa dipakai.
+    function muatAwal() {
+      if (!desktop.matches || gerakanMinimal.matches) return;
+
+      for (const baris of daftar.querySelectorAll(".baris-proyek")) {
+        const path = baris.dataset.gambar?.split(",")[0]?.trim();
+
+        if (path && !cache.has(path)) {
+          const foto = new Image();
+          foto.src = path;
+          cache.set(path, foto);
+        }
+      }
+    }
+
+    // Tandai baris aktif dan muat gambarnya ke dalam panel.
+    function pilih(baris) {
+      if (!desktop.matches || gerakanMinimal.matches || baris?.closest(".d-none, [hidden]")) {
+        baris = null;
+      }
+
+      if (aktif === baris) return;
+
+      aktif?.classList.remove("is-aktif");
+      aktif = baris;
+      daftar.classList.toggle("ada-aktif", Boolean(aktif));
+      panel.classList.remove("terlihat");
+
+      if (aktif) {
+        aktif.classList.add("is-aktif");
+        const path = aktif.dataset.gambar?.split(",")[0]?.trim();
+        if (path) gambar.src = path;
+        baru = true;
+      }
+
+      jadwalkanPenunjuk();
+    }
+
+    gambar.onload = () => {
+      if (aktif && desktop.matches && !gerakanMinimal.matches) {
+        // Mulai lagi efek tersingkap saat pengguna pindah ke proyek lain.
+        void panel.offsetWidth;
+        panel.classList.add("terlihat");
+      }
+    };
+
+    gambar.onerror = () => panel.classList.remove("terlihat");
+
+    daftar.addEventListener("pointermove", (event) => {
+      if (!(event.target instanceof Element)) return;
+
+      keyboard = false;
+      pilih(event.pointerType === "mouse" ? event.target.closest(".baris-proyek") : null);
+    }, { passive: true });
+
+    daftar.addEventListener("pointerleave", () => {
+      if (!keyboard) pilih(null);
+    });
+
+    daftar.addEventListener("focusin", (event) => {
+      if (!(event.target instanceof Element)) return;
+
+      if (event.target.matches(":focus-visible")) {
+        keyboard = true;
+        pilih(event.target.closest(".baris-proyek"));
+      }
+    });
+
+    daftar.addEventListener("focusout", (event) => {
+      if (!daftar.contains(event.relatedTarget)) pilih(null);
+    });
+
+    // Tutup pratinjau saat daftar berpindah, disaring, atau tertutup modal.
+    function tutup() {
+      pilih(null);
+    }
+
+    document.addEventListener("show.bs.modal", tutup);
+    document.querySelector(".filter-proyek")?.addEventListener("click", tutup);
+    window.addEventListener("scroll", tutup, { passive: true });
+    window.addEventListener("blur", tutup);
+
+    // Periksa kembali ukuran layar dan preferensi gerakan yang baru.
+    function aturPerangkat() {
+      tutup();
+      muatAwal();
+    }
+
+    desktop.addEventListener("change", aturPerangkat);
+    gerakanMinimal.addEventListener("change", aturPerangkat);
+    muatAwal();
+
+    pelukis.push((pos) => {
+      if (!aktif) return false;
+
+      if (!pos && !keyboard) {
+        tutup();
+        return false;
+      }
+
+      const kotak = aktif.getBoundingClientRect();
+      const px = keyboard ? kotak.right - panel.offsetWidth : pos.x;
+      const py = keyboard ? kotak.top : pos.y;
+
+      // Jaga gambar tetap di dalam layar, termasuk saat mouse mendekati tepi.
+      const tujuanX = Math.max(8, Math.min(window.innerWidth - panel.offsetWidth - 8, px + 24));
+      const tujuanY = Math.max(8, Math.min(window.innerHeight - panel.offsetHeight - 8, py + 18));
+
+      if (baru) {
+        x = tujuanX;
+        y = tujuanY;
+        baru = false;
+      }
+
+      const dx = (tujuanX - x) * 0.18;
+      x += dx;
+      y += (tujuanY - y) * 0.18;
+
+      const sudut = Math.min(6, Math.max(-6, dx * 0.35));
+      kemiringan += (sudut - kemiringan) * 0.25;
+
+      panel.style.translate = `${x}px ${y}px`;
+      panel.style.rotate = `${kemiringan}deg`;
+
+      return Math.hypot(tujuanX - x, tujuanY - y) > 0.3 || Math.abs(kemiringan) > 0.1;
+    });
+  }
+
+  // Jalankan sapuan layar untuk tautan ke halaman HTML di dalam situs.
   function siapkanTransisiHalaman() {
     const panel = document.createElement("div");
     panel.className = "panel-halaman";
@@ -477,52 +776,90 @@
     document.body.append(panel);
 
     let tujuan = null;
-    let timer;
+    let timer = 0;
+    let frame = 0;
 
+    // Hapus alamat tujuan yang disimpan untuk animasi masuk.
+    function hapusPenanda() {
+      try {
+        sessionStorage.removeItem(kunciTransisi);
+      } catch {
+        // Navigasi tetap berjalan jika penyimpanan sesi tidak tersedia.
+      }
+    }
+
+    // Lepas panel ketika navigasi selesai, dibatalkan, atau dipulihkan lewat Back.
+    function pulihkan() {
+      window.clearTimeout(timer);
+      window.cancelAnimationFrame(frame);
+      tujuan = null;
+      akar.classList.remove("masuk-transisi");
+      panel.classList.remove("panel-menutup", "panel-membuka");
+    }
+
+    // Buka halaman tujuan setelah sapuan penutup selesai.
     function pindah() {
       if (!tujuan) return;
 
       window.clearTimeout(timer);
       const alamat = tujuan;
       tujuan = null;
-      window.location.assign(alamat);
+
+      try {
+        sessionStorage.setItem(kunciTransisi, alamat.href);
+      } catch {
+        // Halaman tujuan tetap dapat dibuka tanpa penanda.
+      }
+
+      window.location.assign(alamat.href);
+      timer = window.setTimeout(pulihkan, 1200);
     }
 
-    function pulihkan() {
-      window.clearTimeout(timer);
-      tujuan = null;
-      panel.classList.remove("panel-menutup", "panel-membuka");
-    }
+    hapusPenanda();
 
-    if (!gerakanMinimal.matches) panel.classList.add("panel-membuka");
+    if (akar.classList.contains("masuk-transisi") && !gerakanMinimal.matches) {
+      frame = window.requestAnimationFrame(() => {
+        panel.classList.add("panel-membuka");
+        akar.classList.remove("masuk-transisi");
+      });
+
+      timer = window.setTimeout(pulihkan, 1200);
+    } else {
+      pulihkan();
+    }
 
     panel.addEventListener("animationend", (event) => {
       if (event.animationName === "tutup-halaman") pindah();
-      if (event.animationName === "buka-halaman") panel.classList.remove("panel-membuka");
+
+      if (event.animationName === "buka-halaman") {
+        panel.classList.remove("panel-membuka");
+      }
     });
 
     document.addEventListener("click", (event) => {
       if (gerakanMinimal.matches || event.defaultPrevented || event.button !== 0) return;
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (event.ctrlKey || event.shiftKey || event.metaKey || event.altKey) return;
+      if (!(event.target instanceof Element)) return;
 
       const tautan = event.target.closest("a[href]");
-      if (!tautan || tautan.hasAttribute("download")) return;
+      if (!tautan || tautan.closest("[data-bs-toggle]") || tautan.hasAttribute("download")) return;
       if (tautan.target && tautan.target.toLowerCase() !== "_self") return;
 
       const alamat = new URL(tautan.href, window.location.href);
-      const protokolLokal = ["http:", "https:", "file:"].includes(alamat.protocol);
-      if (!protokolLokal || alamat.origin !== window.location.origin) return;
-      if (!alamat.pathname.toLowerCase().endsWith(".html") || tautan.href.includes("#")) return;
+      if (!["http:", "https:", "file:"].includes(alamat.protocol)) return;
+      if (alamat.origin !== window.location.origin || alamat.href.includes("#")) return;
+      if (!alamat.pathname.toLowerCase().endsWith(".html")) return;
 
       event.preventDefault();
       if (tujuan) return;
 
-      tujuan = alamat.href;
+      window.clearTimeout(timer);
+      window.cancelAnimationFrame(frame);
+      tujuan = alamat;
+      akar.classList.remove("masuk-transisi");
       panel.classList.remove("panel-membuka");
       panel.classList.add("panel-menutup");
-
-      // Navigasi tetap berjalan jika animasi CSS tidak selesai.
-      timer = window.setTimeout(pindah, 420);
+      timer = window.setTimeout(pindah, 400);
     });
 
     gerakanMinimal.addEventListener("change", () => {
@@ -533,16 +870,39 @@
 
     window.addEventListener("pagehide", pulihkan);
     window.addEventListener("pageshow", (event) => {
-      if (event.persisted) pulihkan();
+      if (event.persisted) {
+        hapusPenanda();
+        pulihkan();
+      }
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    siapkanJudulHero();
-    siapkanEfekKetik();
-    siapkanReveal();
-    siapkanTimeline();
-    siapkanKursor();
-    siapkanTransisiHalaman();
-  });
+  // Mulai setiap fitur secara terpisah agar fitur lain tetap berjalan jika satu gagal.
+  function inisialisasi() {
+    for (const fitur of [
+      siapkanHero,
+      siapkanEfekKetik,
+      siapkanReveal,
+      siapkanTimeline,
+      siapkanAnimasiFilter,
+      siapkanPenunjuk,
+      siapkanKursor,
+      siapkanMagnet,
+      siapkanGuling,
+      siapkanPratinjau,
+      siapkanTransisiHalaman
+    ]) {
+      try {
+        fitur();
+      } catch (galat) {
+        console.error(`Gagal memulai ${fitur.name}.`, galat);
+      }
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inisialisasi, { once: true });
+  } else {
+    inisialisasi();
+  }
 })();

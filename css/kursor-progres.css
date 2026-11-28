@@ -1,0 +1,107 @@
+/* Mengatur kursor, garis progres scroll, tombol kembali ke atas, dan panel transisi halaman.
+   Dipakai di semua halaman. Dimuat setelah modal-carousel.css. */
+
+#progress-scroll {
+  position: fixed;
+  z-index: 1031;
+  inset: 0 0 auto;
+  height: var(--tinggi-progres);
+  background-color: var(--aksen);
+  transform: scaleX(var(--progres, 0));
+  transform-origin: left;
+  pointer-events: none;
+}
+
+#kembali-ke-atas {
+  position: fixed;
+  z-index: 1010;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+#kembali-ke-atas:is(:hover, :focus-visible, :active) {
+  color: var(--warna-tautan);
+  border-color: var(--aksen);
+}
+
+.panel-halaman,
+.kursor-kecil {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.js.masuk-transisi::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 1090;
+    background-color: var(--latar-awal);
+    pointer-events: none;
+  }
+
+  html.js .panel-halaman {
+    position: fixed;
+    inset: 0;
+    z-index: 1090;
+    display: block;
+    visibility: hidden;
+    background-color: var(--latar-awal);
+    pointer-events: none;
+  }
+
+  html.js .panel-halaman.panel-menutup {
+    visibility: visible;
+    border-right: 3px solid var(--aksen);
+    animation: tutup-halaman var(--durasi-panel) ease-in-out both;
+    pointer-events: auto;
+  }
+
+  html.js .panel-halaman.panel-membuka {
+    visibility: visible;
+    border-left: 3px solid var(--aksen);
+    animation: buka-halaman var(--durasi-panel) ease-out both;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html.js .kursor-kecil {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1100;
+    display: block;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--durasi-hover);
+  }
+
+  html.js .kursor-kecil.terlihat {
+    opacity: 1;
+  }
+
+  html.js .kursor-kecil::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    translate: -50% -50%;
+    scale: 1;
+    border-radius: 50%;
+    background-color: var(--aksen);
+    opacity: 0.8;
+    transition: scale var(--durasi-hover) ease-out;
+  }
+
+  html.js .kursor-kecil.di-atas-kontrol::before {
+    scale: 2.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-halaman,
+  .kursor-kecil {
+    display: none;
+  }
+}

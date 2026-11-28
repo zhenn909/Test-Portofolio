@@ -1,0 +1,252 @@
+/* Filter kategori, galeri unggulan StokKu, indeks proyek, dan pratinjau gambar.
+   Dipakai di halaman Proyek. Dimuat setelah animasi.css. */
+
+/* Filter kategori */
+.filter-proyek .btn {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--bs-secondary-color);
+}
+
+.filter-proyek small {
+  font-size: 0.78em;
+  font-variant-numeric: tabular-nums;
+}
+
+.filter-proyek .btn:is(:hover, :focus-visible) {
+  color: var(--warna-tautan);
+}
+
+.filter-proyek .btn.active,
+.filter-proyek .btn:active {
+  border-bottom-color: var(--aksen);
+  background: transparent;
+  color: var(--warna-teks);
+}
+
+/* Galeri unggulan StokKu */
+.galeri-unggulan {
+  min-width: 0;
+  padding: 0.75rem 0.25rem;
+}
+
+.galeri-unggulan figure {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 15rem;
+  text-align: center;
+}
+
+.galeri-unggulan img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 24rem;
+  margin-inline: auto;
+}
+
+.galeri-unggulan figcaption {
+  line-height: 1.4;
+}
+
+@media (max-width: 767.98px) {
+  .galeri-unggulan {
+    padding-inline: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .galeri-unggulan:focus-within figure:focus-within {
+    z-index: 1;
+    transform: scale(1.08);
+  }
+
+  .galeri-unggulan:focus-within figure:not(:focus-within) {
+    opacity: 0.6;
+    transform: scale(0.96);
+  }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .galeri-unggulan figure {
+    transition:
+      transform var(--durasi-galeri) var(--gerak-masuk),
+      opacity var(--durasi-galeri) var(--gerak-masuk);
+  }
+}
+
+@media (min-width: 768px) and (hover: hover) {
+  .galeri-unggulan:not(:focus-within) figure:hover {
+    z-index: 1;
+    transform: scale(1.08);
+  }
+
+  .galeri-unggulan:not(:focus-within):has(figure:hover) figure:not(:hover) {
+    opacity: 0.6;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galeri-unggulan figure {
+    transform: none !important;
+  }
+}
+
+/* Satu tombol membuka modal dari seluruh permukaan baris. */
+#indeks-proyek {
+  padding-top: 2rem;
+}
+
+.baris-proyek {
+  position: relative;
+  isolation: isolate;
+}
+
+.baris-proyek .nomor-bagian {
+  margin-bottom: 0.35rem;
+  color: var(--aksen);
+}
+
+.baris-proyek h2 {
+  font: 400 clamp(1.8rem, 4.2vw, 3.4rem) / 1.1 var(--font-judul);
+}
+
+.nama-proyek {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  font: inherit;
+}
+
+.nama-proyek:focus-visible::after {
+  outline: 2px solid var(--aksen);
+}
+
+.gambar-indeks {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.lingkar-panah {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--aksen);
+  border-radius: 50%;
+  color: var(--warna-tautan);
+}
+
+.lingkar-panah span {
+  rotate: -45deg;
+}
+
+/* Di HP, gambar tampil di bawah judul dan bisa disentuh untuk membuka modal. */
+.pratinjau-proyek {
+  display: none;
+}
+
+@media (min-width: 992px) and (hover: hover) and (pointer: fine) {
+  .gambar-indeks {
+    display: none;
+  }
+}
+
+/* JavaScript memilih baris aktif saat mouse bergerak atau tombol menerima fokus. */
+@media (min-width: 992px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .baris-proyek::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(var(--aksen-rgb), 0.09);
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale 320ms ease;
+  }
+
+  .baris-proyek,
+  .lingkar-panah,
+  .lingkar-panah span,
+  .nama-proyek .judul-indeks {
+    transition:
+      opacity 240ms ease,
+      background-color 240ms ease,
+      rotate 240ms ease,
+      translate 240ms ease;
+  }
+
+  .judul-indeks {
+    display: inline-block;
+  }
+
+  .ada-aktif .baris-proyek:not(.is-aktif) {
+    opacity: 0.45;
+  }
+
+  .baris-proyek.is-aktif::before {
+    scale: 1;
+  }
+
+  .baris-proyek.is-aktif .judul-indeks {
+    translate: 6px 0;
+  }
+
+  .baris-proyek.is-aktif .lingkar-panah {
+    background: var(--aksen);
+    color: var(--teks-di-aksen);
+  }
+
+  .baris-proyek.is-aktif .lingkar-panah span {
+    rotate: 0deg;
+  }
+
+  /* Satu gambar mengambang dipakai bergantian oleh keempat baris. */
+  .pratinjau-proyek {
+    display: block;
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: min(260px, 30vw);
+    height: min(340px, 70vh);
+    z-index: 1020;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 8px;
+    margin: 0;
+    clip-path: inset(100% 0 0);
+    transition: clip-path 450ms ease;
+  }
+
+  .pratinjau-proyek.terlihat {
+    clip-path: inset(0);
+    animation: buka-pratinjau 450ms ease;
+  }
+
+  .pratinjau-proyek img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+@keyframes buka-pratinjau {
+  from {
+    clip-path: inset(100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}

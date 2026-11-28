@@ -1,0 +1,107 @@
+/* Mengatur badge, modal, dan carousel di Proyek serta alert dan toast di Kontak.
+   Dimuat di semua halaman setelah form.css. */
+
+.badge.text-bg-secondary {
+  color: var(--teks-badge) !important;
+  background-color: var(--latar-badge) !important;
+}
+
+.alert-success {
+  --bs-alert-color: var(--teks-sukses);
+  --bs-alert-bg: var(--latar-sukses);
+  --bs-alert-border-color: var(--garis-sukses);
+}
+
+#modal-proyek {
+  --bs-modal-bg: var(--warna-panel);
+  --bs-modal-color: var(--warna-teks);
+  --bs-modal-border-color: var(--bs-border-color);
+  --bs-modal-header-border-color: var(--bs-border-color);
+  --bs-modal-footer-border-color: var(--bs-border-color);
+  --bs-modal-border-radius: 0.25rem;
+}
+
+#modal-proyek .modal-title {
+  font-family: var(--font-judul);
+  font-weight: 400;
+}
+
+#modal-proyek .tutup-modal,
+#modal-proyek .modal-footer .btn-secondary {
+  --bs-btn-color: var(--teks-badge);
+  --bs-btn-bg: var(--latar-badge);
+  --bs-btn-border-color: var(--bs-secondary-color);
+  --bs-btn-hover-color: var(--latar-awal);
+  --bs-btn-hover-bg: var(--warna-teks);
+  --bs-btn-hover-border-color: var(--warna-teks);
+  --bs-btn-active-color: var(--teks-di-aksen);
+  --bs-btn-active-bg: var(--aksen);
+  --bs-btn-active-border-color: var(--aksen);
+}
+
+#modal-proyek .tutup-modal {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  margin-inline-start: 1rem;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+#modal-proyek :is(.tutup-modal, .btn-secondary):focus-visible {
+  background-color: var(--warna-teks);
+  color: var(--latar-awal);
+  outline: 2px solid var(--aksen);
+}
+
+#modal-gambar img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 60vh;
+  max-height: 60svh;
+  object-fit: contain;
+}
+
+#carousel-proyek .carousel-indicators {
+  position: static;
+  gap: 0.2rem;
+  margin: 0 0 0.5rem;
+}
+
+#carousel-proyek .carousel-indicators [data-bs-target] {
+  background-color: var(--warna-teks);
+}
+
+#carousel-proyek .carousel-indicators .active {
+  background-color: var(--aksen);
+}
+
+#carousel-proyek :is(.carousel-control-prev, .carousel-control-next) {
+  top: 2rem;
+  width: clamp(2.75rem, 12%, 5rem);
+  opacity: 1;
+}
+
+#carousel-proyek :is(.carousel-control-prev-icon, .carousel-control-next-icon) {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgb(255 255 255 / 65%);
+  border-radius: 50%;
+  background-color: rgb(16 16 18 / 84%);
+  background-size: 55% 55%;
+  filter: none;
+}
+
+#carousel-proyek button:focus-visible {
+  outline-offset: -2px;
+}
+
+#toast-salin-email {
+  --bs-toast-bg: var(--warna-panel);
+  --bs-toast-color: var(--warna-teks);
+  --bs-toast-border-color: var(--bs-border-color);
+  max-width: calc(100vw - 2rem);
+  box-shadow: none;
+}

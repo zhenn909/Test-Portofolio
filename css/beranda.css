@@ -1,0 +1,284 @@
+/* Hero, penanda bagian, skill, dan timeline.
+   Dipakai di halaman Beranda. Dimuat setelah animasi.css. */
+
+.hero {
+  position: relative;
+}
+
+.hero-kiri {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+  padding-block: var(--jarak-hero);
+}
+
+.hero-teks {
+  position: relative;
+  width: 100%;
+  padding-inline-start: clamp(1rem, 2.7vw, 2.75rem);
+}
+
+.hero-teks::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 1px;
+  background-color: var(--aksen);
+  transform-origin: top;
+}
+
+.hero h1 {
+  margin-bottom: 1.25rem;
+  font-size: var(--ukuran-nama);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.hero h1::after {
+  content: ".";
+  content: "." / "";
+  color: var(--aksen);
+}
+
+.hero .lead,
+#teks-ketik {
+  color: var(--bs-secondary-color);
+  font-size: var(--ukuran-peran);
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+#teks-ketik:not(:empty) {
+  min-height: 1.55em;
+}
+
+.hero .btn-outline-primary {
+  padding-block: 0.65rem;
+  font-weight: 600;
+  --bs-btn-color: var(--aksen);
+}
+
+.hero-lihat-proyek {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  margin-top: 1.75rem;
+  color: var(--warna-teks);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.hero-lihat-proyek::before {
+  content: "";
+  width: 2.25rem;
+  height: 1px;
+  background-color: var(--aksen);
+}
+
+.panah-proyek {
+  display: inline-grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 1px solid var(--aksen);
+  border-radius: 50%;
+  color: var(--warna-tautan);
+  line-height: 1;
+}
+
+.hero-lihat-proyek:hover {
+  color: var(--warna-tautan);
+}
+
+.hero-kanan {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.foto-hero {
+  display: block;
+  width: 100%;
+  height: 55vh;
+  height: 55svh;
+  border: 0;
+  border-radius: 0;
+  object-fit: cover;
+  object-position: top center;
+  filter: grayscale(1) contrast(1.1) brightness(0.95);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 16%, black 85%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, black 16%, black 85%, transparent);
+}
+
+#penanda-bagian {
+  position: fixed;
+  z-index: 1010;
+  inset-inline-end: clamp(0.25rem, 0.75vw, 1rem);
+  top: 50%;
+  transform: translateY(-50%);
+  align-items: center;
+}
+
+#penanda-bagian .nav-link {
+  display: grid;
+  width: 1.75rem;
+  height: 2rem;
+  padding: 0;
+  place-items: center;
+}
+
+#penanda-bagian .nav-link::before {
+  content: "";
+  width: 2px;
+  height: 0.6rem;
+  background-color: var(--bs-secondary-color);
+  opacity: 0.6;
+}
+
+#penanda-bagian .nav-link.active::before {
+  height: 1.5rem;
+  background-color: var(--aksen);
+  opacity: 1;
+}
+
+body[data-bs-spy="scroll"] main > section {
+  /* Jarak bagian menggantikan utility py-5. */
+  padding-block: var(--jarak-bagian) !important;
+}
+
+#skill li {
+  font: 400 var(--ukuran-skill) / 1.35 var(--font-judul);
+}
+
+#skill li > span {
+  display: inline-block;
+}
+
+.timeline {
+  position: relative;
+  padding: 0;
+}
+
+.timeline > li {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  margin-inline-start: var(--jarak-titik);
+  padding: 0 0 var(--jarak-timeline) 1.5rem;
+  border-inline-start: 1px solid var(--bs-border-color);
+}
+
+.timeline > li:last-child {
+  padding-bottom: 0;
+  border-color: transparent;
+}
+
+.timeline > li::before {
+  content: "";
+  position: absolute;
+  top: 0.55em;
+  left: -1px;
+  width: var(--diameter-titik);
+  height: var(--diameter-titik);
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background-color: var(--aksen);
+}
+
+.timeline strong {
+  font: 400 var(--ukuran-tahun) / 1.15 var(--font-judul);
+}
+
+@media (min-width: 768px) {
+  .timeline > li {
+    grid-template-columns: minmax(6.5rem, 0.8fr) minmax(0, 1.2fr);
+    column-gap: 1rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .hero > .row {
+    min-height: calc(100vh - var(--tinggi-nav));
+    min-height: calc(100svh - var(--tinggi-nav));
+  }
+
+  .hero-kiri {
+    position: relative;
+    padding-block: 5rem;
+  }
+
+  .hero-lihat-proyek {
+    position: absolute;
+    bottom: 1.25rem;
+    margin-top: 0;
+  }
+
+  .foto-hero {
+    height: 82vh;
+    height: 82svh;
+    max-height: calc(100svh - var(--tinggi-nav));
+    -webkit-mask-image:
+      linear-gradient(to right, transparent, black 32%),
+      linear-gradient(to top, transparent, black 26%);
+    mask-image:
+      linear-gradient(to right, transparent, black 32%),
+      linear-gradient(to top, transparent, black 26%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.js .hero-siap .hero-teks::before {
+    animation: garis-hero 480ms var(--gerak-masuk) backwards;
+  }
+
+  html.js .hero-siap .baris-judul {
+    animation: kata-hero var(--durasi-judul) var(--gerak-masuk) backwards;
+    animation-delay: calc(100ms + var(--urutan-kata, 0) * 120ms);
+  }
+
+  html.js .hero-siap .lead {
+    animation: isi-hero 450ms var(--gerak-masuk) 330ms backwards;
+  }
+
+  html.js .hero-siap #teks-ketik {
+    animation: isi-hero 450ms var(--gerak-masuk) 430ms backwards;
+  }
+
+  html.js .hero-siap .hero-teks .btn:not(:focus-visible) {
+    animation: isi-hero 450ms var(--gerak-masuk) 530ms backwards;
+  }
+
+  html.js .hero-siap .hero-lihat-proyek:not(:focus-visible) {
+    animation: isi-hero 450ms var(--gerak-masuk) 620ms backwards;
+  }
+
+  html.js .hero-siap .foto-hero {
+    transform-origin: bottom center;
+    animation: foto-masuk 1s var(--gerak-masuk) 160ms backwards;
+  }
+
+  html.js #teks-ketik.sedang-mengetik > [aria-hidden="true"]::after {
+    content: "";
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-inline-start: 0.12em;
+    vertical-align: -0.12em;
+    background-color: var(--aksen);
+    animation: kedip-ketik 1s steps(1, end) infinite;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  #skill li:hover > span {
+    transform: translateX(0.4rem);
+  }
+}
